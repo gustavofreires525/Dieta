@@ -1,5 +1,5 @@
 // Service worker: abre mesmo sem internet; com internet, sempre pega a versão mais nova.
-const CACHE = 'dieta-d8a1b04b2c';
+const CACHE = 'dieta-16bf4c5f3e';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'content.json'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(() => {})).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

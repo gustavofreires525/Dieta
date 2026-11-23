@@ -133,7 +133,7 @@ summary{cursor:pointer;font-weight:700}
 .ins .em{font-size:1.5rem}
 .ins.w{border-color:rgba(251,191,36,.45)} .ins.r{border-color:rgba(248,113,113,.45)} .ins.g{border-color:rgba(74,222,128,.45)}
 @media (max-width:899px){
-  .app{grid-template-columns:1fr}
+  .app{grid-template-columns:minmax(0,1fr)}
   .side{display:none}
   .bottom{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--bg2);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
   .bottom button{flex:1;border:0;background:none;color:var(--mut);padding:6px 0;font-size:.68rem;display:grid;gap:2px;justify-items:center;cursor:pointer}
@@ -150,6 +150,26 @@ summary{cursor:pointer;font-weight:700}
 .syncpill{position:fixed;top:8px;right:10px;z-index:40;font-size:.72rem;padding:4px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--mut);display:none;pointer-events:none;box-shadow:var(--shadow)}
 .syncpill.on{display:block}.syncpill.ok{color:var(--acc)}.syncpill.warn{color:#f5b942}.syncpill.err{color:#ff6b6b}
 @media(max-width:800px){.syncpill{top:6px;right:6px;font-size:.68rem}}
+
+/* ===== biblioteca de exercícios ===== */
+.eximg{display:flex;align-items:center;justify-content:center;gap:0;background:var(--bg2);border-radius:12px;padding:4px 2px}
+.eximg svg{width:48%;height:auto;max-height:150px}.eximg i{font-style:normal;color:var(--mut);font-size:.8rem}
+.eximg.big svg{max-height:260px}
+.exmini{display:flex;background:var(--bg2);border-radius:8px;flex:none;width:92px}.exmini svg{width:50%;height:auto}
+.exgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr))}
+.exrow{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(200px,100%),1fr))}
+.excard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;cursor:pointer;display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--line);transition:transform .12s}
+.excard:hover{transform:translateY(-2px)}.excard .exb{padding:2px 4px 4px}.excard .exb b{font-size:.92rem;line-height:1.25;display:block}
+.excard.r-o{border-top-color:#22c55e}.excard.r-b{border-top-color:#fbbf24}.excard.r-d{border-top-color:#ef4444}
+.rate{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.74rem;font-weight:800;color:#fff;white-space:nowrap}
+.rate.r-o{background:#16a34a}.rate.r-b{background:#d99a06;color:#1a1200}.rate.r-d{background:#dc2626}
+.note.r-o{border-left:4px solid #22c55e}.note.r-b{border-left:4px solid #fbbf24}.note.r-d{border-left:4px solid #ef4444}
+.plit{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.plit:last-of-type{border-bottom:0}
+.excard,.eximg{min-width:0}.eximg svg{min-width:0}.excard .exb .row{flex-wrap:wrap}
+@media(max-width:700px){.exgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.exrow{grid-template-columns:repeat(2,minmax(0,1fr))}.exmini{width:76px}.excard .exb b{font-size:.82rem}.rate{font-size:.68rem;padding:1px 8px}.excard .pill{font-size:.66rem;padding:1px 7px}}
+
+main{min-width:0}.tabs{max-width:100%}
 
 </style>
 </head>
@@ -1509,6 +1529,398 @@ function render() {
 function subTabs(key, items) { const cur = SUB[key] || items[0][0]; return `<div class="tabs">${items.map(([k, l]) => `<span class="chip ${cur === k ? 'on' : ''}" data-act="sub" data-key="${key}" data-k="${k}">${l}</span>`).join('')}</div>`; }
 const subOf = (key, def) => SUB[key] || def;
 
+
+/* ================= BONEQUINHOS (SVG) — cinemática simples, 2 quadros por exercício ================= */
+const EXV = {LT: 28, UA: 15, FA: 14, TH: 22, SH: 22};
+function ik2(o, t, l1, l2, s) {
+  const dx = t[0] - o[0], dy = t[1] - o[1], dist = Math.hypot(dx, dy) || .001;
+  const d = Math.min(Math.max(dist, Math.abs(l1 - l2) + .05), l1 + l2 - .05), ux = dx / dist, uy = dy / dist;
+  const A = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d)))) * s, ang = Math.atan2(dy, dx) + A;
+  return [[o[0] + l1 * Math.cos(ang), o[1] + l1 * Math.sin(ang)], [o[0] + ux * d, o[1] + uy * d]];
+}
+const RAD = Math.PI / 180;
+function jointsS(f) {
+  const hip = (f.hip || [58, 52]).slice(), t = (f.t || 0) * RAD, ux = Math.sin(t), uy = -Math.cos(t);
+  const sh = [hip[0] + EXV.LT * ux, hip[1] + EXV.LT * uy - (f.lift || 0)];
+  const hd = (f.t || 0) + (f.hd || 0), head = [sh[0] + 9.5 * Math.sin(hd * RAD), sh[1] - 9.5 * Math.cos(hd * RAD)];
+  const A = f.A || {h: [0, 29], s: 1}, A2 = f.A2 || A, L = f.L || {f: [0, 44], s: -1}, L2 = f.L2 || L;
+  const arm = (a) => ik2(sh, [sh[0] + a.h[0], sh[1] + a.h[1]], EXV.UA, EXV.FA, a.s || 1);
+  const leg = (l) => ik2(hip, [hip[0] + l.f[0], hip[1] + l.f[1]], EXV.TH, EXV.SH, l.s || -1);
+  const J = {hip, sh, head, arm: arm(A), arm2: arm(A2), leg: leg(L), leg2: leg(L2)};
+  if (f.g !== 'n') {
+    const dy = (f.gy || 92) - Math.max(J.leg[1][1], J.leg2[1][1]);
+    const mv = p => { p[1] += dy; };
+    [J.hip, J.sh, J.head, ...J.arm, ...J.arm2, ...J.leg, ...J.leg2].forEach(mv);
+  }
+  return J;
+}
+const ln = (a, b, w, c, o) => `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${o ? ' opacity="' + o + '"' : ''}/>`;
+const BODY = 'var(--txt)', EQ = 'var(--acc)', EQ2 = 'var(--mut)';
+function drawEq(op, J, f) {
+  const [name, ...a] = op.split(/[:,]/), wr = J.arm[1], hip = J.hip, sh = J.sh, t = (f.t || 0) * RAD;
+  switch (name) {
+    case 'bb': return `<circle cx="${wr[0].toFixed(1)}" cy="${wr[1].toFixed(1)}" r="7.5" fill="none" stroke="${EQ}" stroke-width="2.4"/><circle cx="${wr[0].toFixed(1)}" cy="${wr[1].toFixed(1)}" r="2" fill="${EQ}"/>`;
+    case 'db': return `<circle cx="${wr[0].toFixed(1)}" cy="${wr[1].toFixed(1)}" r="4.6" fill="${EQ}"/>`;
+    case 'kb': return `<circle cx="${wr[0].toFixed(1)}" cy="${(wr[1] + 4).toFixed(1)}" r="5.2" fill="${EQ}"/>`;
+    case 'bench': return ln([hip[0] - 38, hip[1] + 8], [hip[0] + 12, hip[1] + 8], 5, EQ2) + ln([hip[0] - 32, hip[1] + 10], [hip[0] - 32, 94], 2, EQ2, .7) + ln([hip[0] + 6, hip[1] + 10], [hip[0] + 6, 94], 2, EQ2, .7);
+    case 'back': { const c = Math.cos(t), s = Math.sin(t), b = [-c * 6.5, -s * 6.5]; return ln([hip[0] + b[0], hip[1] + b[1]], [sh[0] + b[0] + 5 * s, sh[1] + b[1] - 5 * c], 5, EQ2, .85); }
+    case 'seat': return ln([hip[0] - 12, hip[1] + 7.5], [hip[0] + 15, hip[1] + 7.5], 5, EQ2, .85) + ln([hip[0] + 2, hip[1] + 9], [hip[0] + 2, 94], 2, EQ2, .6);
+    case 'cable': { const px = +a[0], py = +a[1]; return ln([px, py], wr, 1.4, EQ2) + `<circle cx="${px}" cy="${py}" r="2.8" fill="none" stroke="${EQ2}" stroke-width="1.6"/>`; }
+    case 'bar': { const y = +a[0], x = wr[0]; return ln([x - 9, y], [x + 9, y], 3, EQ) + ln([x - 9, y], [x - 9, y - 6], 1.5, EQ2) + ln([x + 9, y], [x + 9, y - 6], 1.5, EQ2); }
+    case 'box': { const x = +a[0], h = +a[1]; return `<rect x="${x}" y="${94 - h}" width="22" height="${h}" rx="2" fill="${EQ2}" opacity=".5"/>`; }
+    case 'ball': return `<circle cx="${a[0]}" cy="${a[1]}" r="${a[2] || 6}" fill="none" stroke="${EQ}" stroke-width="2"/>`;
+    case 'mach': return `<rect x="${+a[0]}" y="${+a[1]}" width="${+a[2]}" height="${+a[3]}" rx="3" fill="none" stroke="${EQ2}" stroke-width="1.6" opacity=".7"/>`;
+    case 'band': return ln(J.leg[1], wr, 1.5, EQ);
+    case 'pad': return ln([+a[0], +a[1]], [+a[2], +a[3]], 5, EQ2, .85);
+  }
+  return '';
+}
+const eqOps = (list, kind) => list.map(op => op === 'W' ? (kind === 'cable' || kind === 'h' ? 'db' : kind || '') : /^C:/.test(op) ? (kind === 'cable' ? op.replace('C:', 'cable:') : '') : op).filter(Boolean);
+function svgS(P, fr, kind) {
+  const f = Object.assign({}, P.all || {}, P[fr]), J = jointsS(f), eq = eqOps(f.eq || P.eq || [], kind);
+  let s = '';
+  s += `<line x1="4" y1="94" x2="116" y2="94" stroke="${EQ2}" stroke-width="1" opacity=".35"/>`;
+  eq.filter(o => /^(bench|back|seat|mach|box|pad)/.test(o)).forEach(o => { s += drawEq(o, J, f); });
+  // membros distantes (mais claros)
+  const off = f.far == null ? 2.5 : f.far;
+  const sh2 = [J.sh[0] + off, J.sh[1]], hip2 = [J.hip[0] + off, J.hip[1]];
+  s += ln(hip2, [J.leg2[0][0] + off, J.leg2[0][1]], 4, BODY, .35) + ln([J.leg2[0][0] + off, J.leg2[0][1]], [J.leg2[1][0] + off, J.leg2[1][1]], 4, BODY, .35);
+  s += ln(sh2, [J.arm2[0][0] + off, J.arm2[0][1]], 3.6, BODY, .35) + ln([J.arm2[0][0] + off, J.arm2[0][1]], [J.arm2[1][0] + off, J.arm2[1][1]], 3.6, BODY, .35);
+  // tronco, cabeça, membros próximos
+  s += ln(J.hip, J.sh, 6, BODY);
+  s += `<circle cx="${J.head[0].toFixed(1)}" cy="${J.head[1].toFixed(1)}" r="5.4" fill="${BODY}"/>`;
+  s += ln(J.hip, J.leg[0], 4.6, BODY) + ln(J.leg[0], J.leg[1], 4.6, BODY) + ln(J.leg[1], [J.leg[1][0] + (f.foot == null ? 6 : f.foot), J.leg[1][1] + (f.toe == null ? 1 : f.toe)], 3.6, BODY);
+  s += ln(J.sh, J.arm[0], 4, BODY) + ln(J.arm[0], J.arm[1], 4, BODY);
+  eq.filter(o => !/^(bench|back|seat|mach|box|pad)/.test(o)).forEach(o => { s += drawEq(o, J, f); });
+  return s;
+}
+function svgF(P, fr, kind) {
+  const f = Object.assign({}, P.all || {}, P[fr]), hip = f.hip || [60, 52];
+  const hw = f.hw == null ? 5 : f.hw, sw = f.sw == null ? 10 : f.sw;
+  const shc = [hip[0], hip[1] - EXV.LT + (f.lean || 0) * 0], A = f.A || {h: [4, 29], s: 1}, L = f.L || {f: [4, 44], s: -1};
+  const sR = [shc[0] + sw, shc[1] + (f.lift ? -f.lift : 0)], sL = [shc[0] - sw, sR[1]];
+  const mir = (o) => ({h: [-o.h[0], o.h[1]], s: -(o.s || 1)}), A2 = f.A2 || A;
+  const armR = ik2(sR, [sR[0] + A.h[0], sR[1] + A.h[1]], EXV.UA, EXV.FA, A.s || 1);
+  const armL = ik2(sL, [sL[0] + mir(A2).h[0], sL[1] + A2.h[1]], EXV.UA, EXV.FA, -(A2.s || 1));
+  const hR = [hip[0] + hw, hip[1]], hL = [hip[0] - hw, hip[1]], L2 = f.L2 || L;
+  const legR = ik2(hR, [hR[0] + L.f[0], hR[1] + L.f[1]], EXV.TH, EXV.SH, L.s || -1);
+  const legL = ik2(hL, [hL[0] - L2.f[0], hL[1] + L2.f[1]], EXV.TH, EXV.SH, -(L2.s || -1));
+  let dy = 0; if (f.g !== 'n') dy = (f.gy || 92) - Math.max(legR[1][1], legL[1][1]);
+  const mv = (p) => [p[0], p[1] + dy], all = [shc, sR, sL, hR, hL, ...armR, ...armL, ...legR, ...legL].map(mv);
+  const [sc, sr, sl, hr, hl, aR0, aR1, aL0, aL1, lR0, lR1, lL0, lL1] = all, head = [sc[0], sc[1] - 9.5], hc = mv(hip);
+  const eq = eqOps(f.eq || P.eq || [], kind); let s = `<line x1="4" y1="94" x2="116" y2="94" stroke="${EQ2}" stroke-width="1" opacity=".35"/>`;
+  eq.forEach(o => { const [n, ...a] = o.split(/[:,]/); if (n === 'bar') s += ln([30, +a[0]], [90, +a[0]], 3, EQ); if (n === 'mach') s += drawEq(o, {arm: [0, aR1]}, f); if (n === 'cable') { s += ln([+a[0], +a[1]], aL1, 1.4, EQ2) + ln([120 - +a[0], +a[1]], aR1, 1.4, EQ2); } if (n === 'bench') s += ln([hc[0] - 14, hc[1] + 8], [hc[0] + 14, hc[1] + 8], 5, EQ2); });
+  s += ln(sl, sr, 5, BODY) + ln(sc, hc, 6, BODY) + ln(hl, hr, 5, BODY);
+  s += `<circle cx="${head[0].toFixed(1)}" cy="${head[1].toFixed(1)}" r="5.4" fill="${BODY}"/>`;
+  s += ln(hr, lR0, 4.6, BODY) + ln(lR0, lR1, 4.6, BODY) + ln(hl, lL0, 4.6, BODY) + ln(lL0, lL1, 4.6, BODY);
+  s += ln(sr, aR0, 4, BODY) + ln(aR0, aR1, 4, BODY) + ln(sl, aL0, 4, BODY) + ln(aL0, aL1, 4, BODY);
+  eq.forEach(o => { const [n] = o.split(/[:,]/); if (n === 'db') s += `<circle cx="${aR1[0].toFixed(1)}" cy="${aR1[1].toFixed(1)}" r="4.4" fill="${EQ}"/><circle cx="${aL1[0].toFixed(1)}" cy="${aL1[1].toFixed(1)}" r="4.4" fill="${EQ}"/>`; if (n === 'bb') s += ln([aL1[0] - 6, aL1[1]], [aR1[0] + 6, aR1[1]], 2.6, EQ) + `<rect x="${(aL1[0] - 8).toFixed(1)}" y="${(aL1[1] - 6).toFixed(1)}" width="3" height="12" rx="1" fill="${EQ}"/><rect x="${(aR1[0] + 5).toFixed(1)}" y="${(aR1[1] - 6).toFixed(1)}" width="3" height="12" rx="1" fill="${EQ}"/>`; if (n === 'bar') s += ''; });
+  return s;
+}
+function exFrame(key, fr, kind) {
+  const P = POSES[key] || POSES.stand, body = P.v === 'F' ? svgF(P, fr, kind) : svgS(P, fr, kind);
+  return `<svg viewBox="0 -16 120 116" class="exf" role="img" aria-label="${fr === 'a' ? 'Posição inicial' : 'Posição final'}">${body}</svg>`;
+}
+const exPair = (key, kind, big) => `<div class="eximg${big ? ' big' : ''}">${exFrame(key, 'a', kind)}<i>→</i>${exFrame(key, 'b', kind)}</div>`;
+
+
+/* ================= POSES (quadro a = início, quadro b = fim). Pontos de mão/pé são relativos ao ombro/quadril ================= */
+const AR = (x, y, s) => ({h: [x, y], s: s == null ? 1 : s}), LG = (x, y, s) => ({f: [x, y], s: s == null ? -1 : s});
+const POSES = {
+  stand: {a: {A: AR(3, 28), L: LG(2, 44)}, b: {A: AR(3, 28), L: LG(2, 44)}},
+  curl: {eq: ['W', 'C:112,90'], a: {A: AR(4, 27), L: LG(2, 44)}, b: {A: AR(14, -6), L: LG(2, 44)}},
+  curl_incl: {eq: ['W', 'back'], a: {t: -32, hip: [52, 52], A: AR(1, 28), L: LG(14, 44)}, b: {t: -32, hip: [52, 52], A: AR(13, 4), L: LG(14, 44)}},
+  ohpress: {eq: ['W'], a: {A: AR(4, 0), L: LG(2, 44)}, b: {A: AR(3, -28), L: LG(2, 44)}},
+  ohpress_s: {eq: ['W', 'seat', 'back'], a: {t: -4, A: AR(4, 0), L: LG(22, 22)}, b: {t: -4, A: AR(2, -28), L: LG(22, 22)}},
+  latraise: {v: 'F', eq: ['W'], a: {A: AR(4, 28, -1), L: LG(4, 44)}, b: {A: AR(27, 2, -1), L: LG(4, 44)}},
+  frontraise: {eq: ['W'], a: {A: AR(3, 28), L: LG(2, 44)}, b: {A: AR(28, 0), L: LG(2, 44)}},
+  rdelt: {v: 'F', eq: ['W'], a: {A: AR(8, 26, -1), A2: AR(8, 26, -1), L: LG(6, 44)}, b: {A: AR(27, 4, -1), L: LG(6, 44)}},
+  upright: {eq: ['W'], a: {A: AR(8, 28), L: LG(2, 44)}, b: {A: AR(9, -6, -1), L: LG(2, 44)}},
+  shrug: {eq: ['W'], a: {A: AR(2, 29), L: LG(2, 44)}, b: {lift: 7, A: AR(2, 29), L: LG(2, 44)}},
+  pushdown: {eq: ['W', 'C:76,4'], a: {t: 6, A: AR(14, 2), L: LG(2, 44)}, b: {t: 6, A: AR(4, 28), L: LG(2, 44)}},
+  overhead_tri: {eq: ['W'], a: {A: AR(-9, -6), L: LG(2, 44)}, b: {A: AR(2, -28), L: LG(2, 44)}},
+  skull: {eq: ['W', 'bench'], a: {t: -90, hip: [74, 70], g: 'n', A: AR(-14, -15), L: LG(24, 22)}, b: {t: -90, hip: [74, 70], g: 'n', A: AR(1, -28), L: LG(24, 22)}},
+  kickback: {eq: ['W'], a: {t: 68, hip: [46, 52], A: AR(-14, 14, -1), L: LG(6, 44)}, b: {t: 68, hip: [46, 52], A: AR(-29, 0, -1), L: LG(6, 44)}},
+  dips: {eq: ['pad:36,51,76,51'], a: {g: 'n', hip: [58, 50], A: AR(1, 28), L: LG(-12, 38, 1)}, b: {g: 'n', hip: [58, 64], A: AR(5, 14), L: LG(-12, 38, 1)}},
+  bench: {eq: ['W', 'bench'], a: {t: -90, hip: [74, 70], g: 'n', A: AR(10, -12), L: LG(22, 22)}, b: {t: -90, hip: [74, 70], g: 'n', A: AR(2, -28), L: LG(22, 22)}},
+  incline: {eq: ['W', 'back'], a: {t: -50, hip: [66, 70], g: 'n', A: AR(10, -12), L: LG(20, 22)}, b: {t: -50, hip: [66, 70], g: 'n', A: AR(6, -28), L: LG(20, 22)}},
+  fly: {eq: ['W', 'bench'], a: {t: -90, hip: [74, 70], g: 'n', A: AR(6, 22, -1), L: LG(22, 22)}, b: {t: -90, hip: [74, 70], g: 'n', A: AR(2, -28), L: LG(22, 22)}},
+  pec: {eq: ['W', 'seat', 'back'], a: {t: -4, A: AR(-10, 4, 1), L: LG(22, 22)}, b: {t: -4, A: AR(26, 4, 1), L: LG(22, 22)}},
+  chestpress: {eq: ['W', 'seat', 'back'], a: {t: -4, A: AR(6, 6, 1), L: LG(22, 22)}, b: {t: -4, A: AR(27, 2, 1), L: LG(22, 22)}},
+  crossover: {v: 'F', eq: ['W', 'cable:10,6'], a: {A: AR(25, -10, -1), L: LG(8, 44)}, b: {A: AR(4, 24, -1), L: LG(8, 44)}},
+  pushup: {eq: [], a: {t: 66, hip: [60, 60], A: AR(0, 29), L: LG(-40, 18)}, b: {t: 82, hip: [63, 60], A: AR(-2, 10), L: LG(-44, 6)}},
+  row_bent: {eq: ['W'], a: {t: 65, hip: [50, 52], A: AR(0, 29), L: LG(8, 44)}, b: {t: 65, hip: [50, 52], A: AR(-14, 13), L: LG(8, 44)}},
+  row_seated: {eq: ['W', 'seat', 'C:116,64'], a: {t: 0, hip: [42, 60], A: AR(28, 3), L: LG(38, 8)}, b: {t: -6, hip: [42, 60], A: AR(3, 15), L: LG(38, 8)}},
+  pulldown: {eq: ['W', 'seat', 'C:60,4'], a: {t: -6, hip: [58, 66], A: AR(4, -28), L: LG(22, 22)}, b: {t: -12, hip: [58, 66], A: AR(10, -2), L: LG(22, 22)}},
+  pullup: {eq: ['bar:6'], a: {g: 'n', hip: [58, 66], A: AR(2, -28), L: LG(-4, 42)}, b: {g: 'n', hip: [58, 50], A: AR(7, -10, -1), L: LG(-4, 42)}},
+  hinge: {eq: ['W'], a: {t: 70, hip: [38, 52], A: AR(-3, 29), L: LG(18, 44)}, b: {t: 0, hip: [56, 52], A: AR(0, 29), L: LG(2, 44)}},
+  squat: {eq: ['W'], a: {A: AR(-2, -3, 1), L: LG(2, 44)}, b: {t: 38, hip: [42, 52], A: AR(-2, -3, 1), L: LG(18, 26)}},
+  goblet: {eq: ['W'], a: {A: AR(8, 8, 1), L: LG(2, 44)}, b: {t: 14, hip: [44, 52], A: AR(10, 8, 1), L: LG(16, 26)}},
+  lunge: {eq: ['W'], a: {A: AR(2, 28), L: LG(2, 44)}, b: {hip: [58, 52], A: AR(2, 28), L: LG(22, 38), L2: LG(-22, 42, -1)}},
+  bulgarian: {eq: ['W', 'pad:14,70,36,70'], a: {A: AR(2, 28), L: LG(22, 44), L2: LG(-30, 26)}, b: {A: AR(2, 28), L: LG(20, 30), L2: LG(-30, 20)}},
+  stepup: {eq: ['W', 'box:64,22'], a: {A: AR(2, 28), L: LG(8, 26), L2: LG(-12, 44)}, b: {A: AR(2, 28), L: LG(6, 44), L2: LG(6, 44)}},
+  legpress: {eq: ['seat'], a: {g: 'n', t: -52, hip: [38, 76], A: AR(18, 6), L: LG(14, -30)}, b: {g: 'n', t: -52, hip: [38, 76], A: AR(18, 6), L: LG(36, -20)}},
+  legext: {eq: ['seat', 'back'], a: {t: -4, hip: [46, 60], g: 'n', A: AR(4, 20), L: LG(22, 22)}, b: {t: -4, hip: [46, 60], g: 'n', A: AR(4, 20), L: LG(43, 4)}},
+  legcurl: {eq: ['pad:16,84,70,84'], a: {t: 84, hip: [74, 78], g: 'n', A: AR(4, 20), L: LG(-44, 2)}, b: {t: 84, hip: [74, 78], g: 'n', A: AR(4, 20), L: LG(-22, -28)}},
+  hipthrust: {eq: ['W', 'pad:14,72,50,72'], a: {t: -50, hip: [62, 80], A: AR(18, 14), L: LG(18, 12)}, b: {t: -86, hip: [62, 80], A: AR(28, 2), L: LG(18, 30)}},
+  calf: {eq: ['W'], a: {A: AR(3, 28), L: LG(2, 44), foot: 6}, b: {g: 'n', hip: [58, 43], toe: 7, A: AR(3, 28), L: LG(2, 44)}},
+  calf_s: {eq: ['W'], a: {t: 0, A: AR(10, 14), L: LG(22, 22)}, b: {t: 0, g: 'n', hip: [58, 56], A: AR(10, 14), L: LG(22, 22)}},
+  abduct: {v: 'F', a: {A: AR(4, 28, -1), L: LG(5, 44)}, b: {A: AR(4, 28, -1), L: LG(22, 40)}},
+  glutekick: {eq: [], a: {t: 80, hip: [60, 60], A: AR(0, 26), L: LG(-1, 22, -1), L2: LG(-1, 22, -1)}, b: {t: 80, hip: [60, 60], A: AR(0, 26), L: LG(-42, -8, 1), L2: LG(-1, 22, -1)}},
+  crunch: {eq: [], a: {t: -88, hip: [76, 70], g: 'n', A: AR(-4, -10), L: LG(22, 8)}, b: {t: -48, hip: [76, 70], g: 'n', A: AR(-4, -12), L: LG(22, 8)}},
+  legraise: {eq: [], a: {t: -88, hip: [46, 86], g: 'n', A: AR(28, 4), L: LG(44, -1)}, b: {t: -88, hip: [46, 86], g: 'n', A: AR(28, 4), L: LG(1, -44)}},
+  hangraise: {eq: ['bar:6'], a: {g: 'n', hip: [58, 66], A: AR(2, -28), L: LG(-2, 44)}, b: {g: 'n', hip: [58, 66], A: AR(2, -28), L: LG(40, -10)}},
+  vsit: {eq: [], a: {t: -20, hip: [52, 76], g: 'n', A: AR(24, -6), L: LG(36, -18)}, b: {t: -42, hip: [52, 76], g: 'n', A: AR(24, -6), L: LG(36, -18)}},
+  cablecrunch: {eq: ['C:70,4'], a: {t: 0, hip: [58, 60], g: 'n', A: AR(6, -4, 1), L: LG(-22, 22)}, b: {t: 62, hip: [58, 60], g: 'n', A: AR(8, -6, 1), L: LG(-22, 22)}},
+  plank: {eq: [], a: {t: 80, hip: [60, 76], g: 'n', A: AR(0, 12, 1), L: LG(-44, 7)}, b: {t: 80, hip: [60, 76], g: 'n', A: AR(0, 12, 1), L: LG(-44, 7)}},
+  mclimb: {eq: [], a: {t: 66, hip: [60, 60], A: AR(0, 29), L: LG(-40, 18), L2: LG(-40, 18)}, b: {t: 66, hip: [60, 60], A: AR(0, 29), L: LG(-40, 18), L2: LG(6, 8)}},
+  hyper: {eq: ['pad:30,72,66,58'], a: {g: 'n', t: 128, hip: [50, 62], A: AR(10, 20), L: LG(-40, 12)}, b: {g: 'n', t: 78, hip: [50, 62], A: AR(10, 20), L: LG(-40, 12)}},
+  wristcurl: {eq: ['W'], a: {t: 24, hip: [44, 56], A: AR(26, 8), L: LG(22, 22)}, b: {t: 24, hip: [44, 56], A: AR(26, -6), L: LG(22, 22)}},
+  strpull: {eq: ['W', 'C:60,4'], a: {A: AR(22, -18), L: LG(2, 44)}, b: {A: AR(3, 28), L: LG(2, 44)}},
+  facepull: {eq: ['W', 'C:116,22'], a: {A: AR(28, -2), L: LG(2, 44)}, b: {A: AR(9, -12, -1), L: LG(2, 44)}},
+  kbswing: {eq: ['kb'], a: {t: 60, hip: [38, 52], A: AR(8, 28), L: LG(18, 44)}, b: {t: 0, hip: [56, 52], A: AR(28, 0), L: LG(2, 44)}},
+  carry: {eq: ['W'], a: {A: AR(1, 29), L: LG(14, 40), L2: LG(-14, 44)}, b: {A: AR(1, 29), L: LG(-14, 44), L2: LG(14, 40)}},
+  thruster: {eq: ['W'], a: {t: 14, hip: [44, 52], A: AR(8, 0), L: LG(16, 26)}, b: {A: AR(3, -28), L: LG(2, 44)}},
+  run: {eq: [], a: {t: 8, hip: [56, 52], A: AR(-8, 16, 1), A2: AR(16, 0, 1), L: LG(18, 34), L2: LG(-20, 40, -1)}, b: {t: 8, hip: [56, 52], A: AR(16, 0, 1), A2: AR(-8, 16, 1), L: LG(-20, 40, -1), L2: LG(18, 34)}},
+  walk: {eq: [], a: {t: 2, hip: [58, 52], A: AR(-6, 26, 1), A2: AR(8, 24, 1), L: LG(12, 42), L2: LG(-12, 44, -1)}, b: {t: 2, hip: [58, 52], A: AR(8, 24, 1), A2: AR(-6, 26, 1), L: LG(-12, 44, -1), L2: LG(12, 42)}},
+  walk_inc: {eq: ['pad:6,92,114,66'], a: {t: 14, g: 'n', hip: [58, 42], A: AR(-6, 26, 1), A2: AR(10, 22, 1), L: LG(12, 40), L2: LG(-12, 42, -1)}, b: {t: 14, g: 'n', hip: [58, 42], A: AR(10, 22, 1), A2: AR(-6, 26, 1), L: LG(-12, 42, -1), L2: LG(12, 40)}},
+  bike: {eq: ['pad:30,66,46,66', 'pad:78,50,86,64'], a: {t: 28, hip: [44, 62], g: 'n', A: AR(24, 10), L: LG(18, 36), L2: LG(-4, 46)}, b: {t: 28, hip: [44, 62], g: 'n', A: AR(24, 10), L: LG(-4, 46), L2: LG(18, 36)}},
+  rower: {eq: ['pad:4,84,116,84'], a: {t: 24, hip: [60, 76], g: 'n', A: AR(26, -2), L: LG(10, 10)}, b: {t: -20, hip: [38, 76], g: 'n', A: AR(6, 14), L: LG(42, 2)}},
+  stairs: {eq: ['box:60,12'], a: {t: 6, A: AR(-6, 26), A2: AR(8, 24), L: LG(14, 32), L2: LG(-8, 44)}, b: {t: 6, A: AR(8, 24), A2: AR(-6, 26), L: LG(4, 44), L2: LG(18, 30)}},
+  jack: {v: 'F', a: {A: AR(6, 28, -1), L: LG(4, 44)}, b: {A: AR(14, -24, -1), L: LG(20, 40)}},
+  rope: {eq: [], a: {A: AR(10, 14, 1), L: LG(2, 44)}, b: {g: 'n', hip: [58, 42], A: AR(10, 14, 1), L: LG(2, 44)}},
+};
+POSES.burpee = {eq: [], a: POSES.squat.b, b: POSES.plank.a};
+POSES.burpee.a = Object.assign({}, POSES.goblet.b, {eq: []});
+
+
+/* ================= BANCO DE EXERCÍCIOS =================
+   Nome|Grupo|Secundários|Equipamento|pose|selo(o=Ótimo,b=Bom,d=Depende)+tipo|nota extra (opcional)
+   tipos: C composto livre · M máquina/guiado · I isolador · P peso do corpo · L cardio leve · H cardio de impacto · E core/estabilidade · R técnica exigente · S situacional */
+const EX_RAW = `
+Supino reto (barra)|Peito|Tríceps,Ombros|Barra|bench|oC|Principal exercício de peito. Use um parceiro ou os pinos de segurança ao chegar perto da falha.
+Supino reto (halteres)|Peito|Tríceps,Ombros|Halteres|bench|oC|Maior amplitude que a barra e trabalha cada lado separadamente.
+Supino inclinado (barra)|Peito|Ombros,Tríceps|Barra|incline|oC|Banco entre 30° e 45° dá ênfase na parte superior do peitoral.
+Supino inclinado (halteres)|Peito|Ombros,Tríceps|Halteres|incline|oC|Banco entre 30° e 45°; desça controlando até a altura do peito.
+Supino declinado (barra)|Peito|Tríceps|Barra|bench|bC|Enfatiza a parte inferior do peitoral.
+Supino reto na máquina|Peito|Tríceps,Ombros|Máquina|chestpress|oM|Guiado e seguro: ótimo para chegar perto da falha sem parceiro.
+Supino inclinado na máquina|Peito|Ombros,Tríceps|Máquina|chestpress|oM|Boa opção para treinar a parte alta do peito com segurança.
+Supino reto no Smith|Peito|Tríceps,Ombros|Smith|bench|bC|Trajetória fixa; bom para treinar sozinho, mas menos estabilização.
+Supino inclinado no Smith|Peito|Ombros,Tríceps|Smith|incline|bC|Trajetória fixa; bom para treinar sozinho.
+Flexão de braço|Peito|Tríceps,Ombros,Abdômen|Peso corporal|pushup|oP|Com seu peso, a carga já é alta. Se ficar pesado, apoie as mãos num banco.
+Flexão inclinada (mãos elevadas)|Peito|Tríceps,Ombros|Peso corporal|pushup|bP|Versão mais leve da flexão: ótima para começar e para fazer muitas repetições.
+Flexão com pés elevados|Peito|Ombros,Tríceps|Peso corporal|pushup|bP|Mais difícil: enfatiza a parte alta do peito e o ombro.
+Flexão diamante|Tríceps|Peito,Ombros|Peso corporal|pushup|bP|Mãos juntas, cotovelos junto ao corpo: foco no tríceps.
+Crucifixo|Peito|Ombros|Halteres|fly|bI|Isolador do peito. Cotovelos levemente flexionados e carga moderada para poupar o ombro.
+Crucifixo inclinado|Peito|Ombros|Halteres|fly|bI|Foco na parte alta do peitoral. Carga moderada.
+Voador (peck deck)|Peito|Ombros|Máquina|pec|bI|Isolador seguro; bom para finalizar o treino de peito.
+Crossover|Peito|Ombros|Cabo|crossover|bI|Tensão constante no peito. Polia alta trabalha a parte de baixo do peitoral.
+Crossover (polia baixa)|Peito|Ombros|Cabo|crossover|bI|Polia baixa, puxando para cima: foco na parte alta do peito.
+Crucifixo no cabo|Peito|Ombros|Cabo|crossover|bI|Tensão constante em toda a amplitude.
+Pullover (halter)|Peito|Costas,Tríceps|Halteres|fly|bI|Trabalha peito e dorsal; use carga moderada e controle o alongamento.
+Mergulho nas paralelas|Tríceps|Peito,Ombros|Peso corporal|dips|dP|Ótimo quando o peso do corpo é confortável, mas com 114 kg sobrecarrega ombros e cotovelos. Prefira a versão assistida.
+Mergulho assistido (máquina)|Tríceps|Peito,Ombros|Máquina|dips|oM|Reduz a carga do corpo: dá para treinar tríceps e peito com boa técnica.
+Puxada frontal|Costas|Bíceps,Ombros|Cabo|pulldown|oM|Base para largura das costas e, se você ainda não faz barra fixa, o substituto ideal.
+Puxada com pegada fechada (triângulo)|Costas|Bíceps|Cabo|pulldown|oM|Mais amplitude e foco na região central das costas.
+Puxada supinada|Costas|Bíceps|Cabo|pulldown|oM|Pegada supinada recruta mais o bíceps junto com o dorsal.
+Pull-down|Costas|Tríceps|Cabo|strpull|bI|Braços estendidos: isola o dorsal. Ótimo para finalizar costas.
+Barra fixa|Costas|Bíceps,Antebraço|Peso corporal|pullup|dP|Excelente exercício, mas com 114 kg é muito difícil no começo. Use a máquina assistida ou a puxada até ganhar força.
+Barra fixa assistida (máquina)|Costas|Bíceps|Máquina|pullup|oM|Reduz o peso do corpo e permite progredir até a barra fixa livre.
+Remada baixa|Costas|Bíceps,Ombros|Cabo|row_seated|oM|Espessura das costas; costas retas e puxe com os cotovelos.
+Remada curvada|Costas|Bíceps,Lombar|Barra|row_bent|oC|Principal exercício de espessura das costas. Mantenha a coluna neutra.
+Remada curvada (halteres)|Costas|Bíceps,Lombar|Halteres|row_bent|oC|Boa para corrigir assimetrias entre os lados.
+Remada unilateral (serrote)|Costas|Bíceps|Halteres|row_bent|oC|Apoie a mão no banco: protege a lombar e permite carga alta.
+Remada cavalinho (barra T)|Costas|Bíceps,Lombar|Barra|row_bent|oC|Permite muita carga para as costas com boa estabilidade.
+Remada na máquina|Costas|Bíceps|Máquina|row_seated|oM|Apoio no peito: foco nas costas, sem exigir a lombar.
+Remada no Smith|Costas|Bíceps|Smith|row_bent|bC|Trajetória guiada; bom para treinar sozinho.
+Remada Pendlay|Costas|Lombar,Bíceps|Barra|row_bent|dR|Explosiva e começa do chão: exige técnica boa e cansa a lombar.
+Remada invertida|Costas|Bíceps|Peso corporal|row_bent|bP|Barra baixa ou argolas; ajuste a inclinação do corpo para a carga.
+Levantamento terra|Posterior|Costas,Glúteos,Lombar|Barra|hinge|oC|Um dos exercícios que mais recrutam músculo e gastam calorias. Comece leve e aprenda a técnica antes de carregar.
+Levantamento terra sumô|Posterior|Glúteos,Costas|Barra|hinge|bC|Pegada entre as pernas: menos exigência na lombar, mais quadril e adutores.
+Levantamento terra com barra hexagonal|Posterior|Quadríceps,Costas|Barra|hinge|oC|Mais fácil de aprender que o terra com barra reta e mais seguro para a lombar.
+Hiperextensão lombar|Costas|Glúteos,Posterior|Peso corporal|hyper|bE|Fortalece lombar e glúteos; suba até o corpo alinhado, sem hiperestender.
+Hiperextensão 45°|Posterior|Glúteos,Lombar|Peso corporal|hyper|bI|Pode segurar um peso no peito para progredir.
+Bom dia (good morning)|Posterior|Lombar,Glúteos|Barra|hinge|dR|Efetivo, mas sobrecarrega a lombar se a técnica falhar. Só com carga leve e boa técnica.
+Desenvolvimento (halteres)|Ombros|Tríceps|Halteres|ohpress_s|oC|Principal exercício de ombros. Cotovelos à frente do corpo, sem arquear a lombar.
+Desenvolvimento (barra em pé)|Ombros|Tríceps,Abdômen|Barra|ohpress|oC|Exige o corpo todo estável; ótimo para ganhar força de ombro.
+Desenvolvimento no Smith|Ombros|Tríceps|Smith|ohpress_s|bC|Trajetória fixa; bom para treinar sozinho.
+Desenvolvimento na máquina|Ombros|Tríceps|Máquina|ohpress_s|oM|Seguro e fácil de levar até a falha.
+Desenvolvimento Arnold|Ombros|Tríceps|Halteres|ohpress_s|bC|Rotação durante a subida; use carga mais leve que no desenvolvimento normal.
+Desenvolvimento por trás da nuca|Ombros|Tríceps|Barra|ohpress|dR|Posição que estressa o ombro e o pescoço; prefira o desenvolvimento à frente.
+Press landmine|Ombros|Peito,Tríceps|Barra|ohpress|bC|Ângulo mais amigável ao ombro.
+Elevação lateral|Ombros||Halteres|latraise|oI|Responsável pela largura dos ombros. Suba até a altura do ombro, sem balançar.
+Elevação lateral no cabo|Ombros||Cabo|latraise|bI|Tensão constante, inclusive na parte de baixo do movimento.
+Elevação lateral na máquina|Ombros||Máquina|latraise|bI|Guiada: fácil de fazer perto da falha.
+Elevação frontal|Ombros|Peito|Halteres|frontraise|bI|A frente do ombro já trabalha muito nos supinos; use pouco volume.
+Crucifixo inverso|Ombros|Costas|Halteres|rdelt|bI|Deltoide posterior: tronco inclinado à frente, cotovelos abertos.
+Crucifixo inverso na máquina|Ombros|Costas|Máquina|rdelt|bI|Guiado: ótimo para o deltoide posterior.
+Face pull|Ombros|Costas,Trapézio|Cabo|facepull|oI|Saúde do ombro e deltoide posterior; puxe em direção ao rosto com cotovelos altos.
+Remada alta|Trapézio|Ombros|Barra|upright|dR|Pode causar pinçamento no ombro. Se fizer, pegada na largura dos ombros e subida até o peito.
+Remada alta no cabo|Trapézio|Ombros|Cabo|upright|dR|Menos agressiva que com barra, mas ainda exige atenção ao ombro.
+Encolhimento (halteres)|Trapézio|Antebraço|Halteres|shrug|bI|Suba os ombros em direção às orelhas, sem girar.
+Encolhimento (barra)|Trapézio|Antebraço|Barra|shrug|bI|Permite muita carga; cuidado para não deixar a pegada limitar.
+Encolhimento no Smith|Trapézio|Antebraço|Smith|shrug|bI|Trajetória guiada.
+Rosca direta|Bíceps|Antebraço|Barra|curl|bI|Cotovelos junto ao corpo, sem balançar o tronco.
+Rosca direta (barra W)|Bíceps|Antebraço|Barra|curl|bI|A barra W alivia os punhos.
+Rosca alternada|Bíceps|Antebraço|Halteres|curl|bI|Gire o punho durante a subida.
+Rosca martelo|Bíceps|Antebraço|Halteres|curl|bI|Pegada neutra: trabalha também o braquial e o antebraço.
+Rosca Scott|Bíceps||Barra|curl|bI|O apoio impede o balanço e isola o bíceps.
+Rosca concentrada|Bíceps||Halteres|curl|bI|Isola bem; boa para finalizar.
+Rosca inclinada|Bíceps||Halteres|curl_incl|oI|Banco inclinado alonga o bíceps na posição inicial: forte estímulo de crescimento.
+Rosca no cabo|Bíceps||Cabo|curl|bI|Tensão constante durante todo o movimento.
+Rosca martelo na corda|Bíceps|Antebraço|Cabo|curl|bI|Tensão constante e pegada neutra.
+Rosca Zottman|Bíceps|Antebraço|Halteres|curl|bI|Sobe com pegada normal e desce girando o punho: trabalha bíceps e antebraço.
+Rosca spider|Bíceps||Halteres|curl|bI|Peito apoiado no banco inclinado: impede o balanço.
+Rosca 21|Bíceps||Barra|curl|dS|Técnica avançada de intensidade; pouco necessária para quem está começando.
+Tríceps corda (polia)|Tríceps||Cabo|pushdown|bI|Abra a corda no final e mantenha os cotovelos fixos.
+Tríceps pulley (barra reta)|Tríceps||Cabo|pushdown|bI|Permite carga maior que a corda.
+Tríceps unilateral no cabo|Tríceps||Cabo|pushdown|bI|Bom para corrigir diferenças entre os lados.
+Tríceps na máquina|Tríceps||Máquina|pushdown|bM|Guiado e seguro.
+Tríceps testa|Tríceps||Barra|skull|oI|Trabalha a cabeça longa do tríceps com boa carga. Cuidado com os cotovelos.
+Tríceps francês|Tríceps||Halteres|overhead_tri|oI|Braços acima da cabeça alongam a cabeça longa, a maior do tríceps.
+Tríceps francês no cabo|Tríceps||Cabo|overhead_tri|oI|Tensão constante com o braço acima da cabeça.
+Tríceps coice|Tríceps||Halteres|kickback|bI|Pouca carga possível; boa para finalizar.
+Mergulho (banco)|Tríceps|Peito,Ombros|Peso corporal|dips|dP|Estressa os ombros e os pulsos, principalmente com muita carga corporal.
+Supino fechado|Tríceps|Peito,Ombros|Barra|bench|oC|Pegada na largura dos ombros: tríceps com muita carga.
+Rosca punho|Antebraço|Bíceps|Barra|wristcurl|bI|Antebraço apoiado nas coxas; movimento só do punho.
+Rosca punho inversa|Antebraço||Barra|wristcurl|bI|Trabalha a parte de cima do antebraço.
+Rosca inversa|Antebraço|Bíceps|Barra|curl|bI|Pegada pronada: antebraço e braquiorradial.
+Caminhada do fazendeiro|Antebraço|Trapézio,Abdômen|Halteres|carry|bC|Segure pesos e caminhe: pegada, trapézio e core. Também gasta calorias.
+Prancha|Abdômen|Ombros|Peso corporal|plank|bE|Corpo alinhado, glúteos contraídos. Comece com 30 a 45 s.
+Prancha lateral|Abdômen|Ombros|Peso corporal|plank|bE|Trabalha os oblíquos e estabiliza o tronco.
+Abdominal supra|Abdômen||Peso corporal|crunch|bI|Movimento curto: enrole o tronco, sem puxar o pescoço.
+Abdominal no cabo|Abdômen||Cabo|cablecrunch|oI|Permite aumentar a carga progressivamente, como qualquer outro músculo.
+Abdominal na máquina|Abdômen||Máquina|crunch|bM|Guiado e com carga progressiva.
+Abdominal bicicleta|Abdômen||Peso corporal|crunch|bI|Trabalha oblíquos e reto abdominal.
+Abdominal remador|Abdômen||Peso corporal|vsit|bI|Tronco e pernas se encontram: boa para a região do meio.
+Giro russo|Abdômen||Halteres|vsit|bI|Giro do tronco com ou sem peso; mantenha as costas estáveis.
+Elevação de pernas|Abdômen||Peso corporal|legraise|bE|Deitado, mantenha a lombar colada ao chão.
+Abdominal infra na barra|Abdômen|Antebraço|Peso corporal|hangraise|bE|Pendurado, suba as pernas controlando para não balançar.
+Elevação de pernas na paralela|Abdômen||Peso corporal|hangraise|bE|Apoiado nos antebraços: mais fácil que pendurado.
+Roda abdominal|Abdômen|Ombros|Peso corporal|plank|dR|Muito exigente para a lombar; só com bom controle de core.
+Escalador (mountain climber)|Abdômen|Ombros,Cardio|Peso corporal|mclimb|bP|Core e cardio ao mesmo tempo, com impacto moderado.
+Agachamento livre|Quadríceps|Glúteos,Posterior,Abdômen|Barra|squat|oC|Um dos exercícios mais completos: recruta muito músculo e gasta bastante energia.
+Agachamento frontal|Quadríceps|Glúteos,Abdômen|Barra|squat|bC|Mais quadríceps e mais exigência de mobilidade e de core.
+Agachamento no Smith|Quadríceps|Glúteos|Smith|squat|bC|Trajetória guiada, bom para treinar sozinho.
+Agachamento goblet|Quadríceps|Glúteos,Abdômen|Halteres|goblet|oC|Ótimo para aprender o agachamento: o peso à frente ajuda na postura.
+Agachamento búlgaro|Quadríceps|Glúteos|Halteres|bulgarian|oC|Unilateral: muito estímulo para quadríceps e glúteos com carga menor.
+Agachamento (peso corporal)|Quadríceps|Glúteos|Peso corporal|squat|bP|Bom para aquecer e para fazer séries longas.
+Agachamento com salto|Quadríceps|Glúteos|Peso corporal|squat|dH|Alto impacto para joelhos e tornozelos; prefira versões sem salto enquanto estiver com mais peso.
+Agachamento sissy|Quadríceps||Peso corporal|squat|dR|Alta tensão nos joelhos; só com boa técnica.
+Hack squat|Quadríceps|Glúteos|Máquina|squat|oM|Foco no quadríceps com a coluna apoiada.
+Leg press 45°|Quadríceps|Glúteos,Posterior|Máquina|legpress|oM|Muita carga com segurança. Não deixe o quadril descolar do banco.
+Leg press horizontal|Quadríceps|Glúteos,Posterior|Máquina|legpress|oM|Boa alternativa ao 45°, mais confortável para a lombar.
+Leg press unilateral|Quadríceps|Glúteos|Máquina|legpress|bM|Uma perna de cada vez: corrige diferenças entre os lados.
+Cadeira extensora|Quadríceps||Máquina|legext|bI|Isola o quadríceps. Se sentir os joelhos, reduza a carga e a amplitude final.
+Cadeira extensora unilateral|Quadríceps||Máquina|legext|bI|Uma perna de cada vez, com carga moderada.
+Afundo|Quadríceps|Glúteos|Halteres|lunge|oC|Unilateral: muito estímulo e equilíbrio. Dê um passo grande para trabalhar mais os glúteos.
+Afundo no Smith|Quadríceps|Glúteos|Smith|lunge|bC|Mais estável que o livre.
+Subida no banco (step-up)|Quadríceps|Glúteos|Halteres|stepup|bC|Use uma caixa na altura do joelho, empurrando com a perna da frente.
+Agachamento sumô|Quadríceps|Glúteos|Kettlebell|goblet|bC|Pés afastados: mais glúteos e adutores.
+Thruster|Quadríceps|Ombros,Glúteos|Halteres|thruster|bC|Agachamento mais desenvolvimento: gasta muita energia.
+Stiff|Posterior|Glúteos,Lombar|Barra|hinge|oC|Alonga os posteriores com carga alta. Joelhos levemente flexionados e costas retas.
+Stiff com halteres|Posterior|Glúteos,Lombar|Halteres|hinge|oC|Boa para aprender o movimento com mais liberdade.
+Levantamento terra romeno|Posterior|Glúteos,Lombar|Barra|hinge|oC|Quadril para trás, barra junto às pernas. Ótimo para posterior de coxa.
+Levantamento terra unilateral|Posterior|Glúteos|Halteres|hinge|bC|Equilíbrio e posterior de coxa, com carga menor.
+Mesa flexora|Posterior||Máquina|legcurl|oI|O melhor isolador para posterior de coxa. Controle a descida.
+Cadeira flexora|Posterior||Máquina|legcurl|oI|Sentado: o alongamento maior da coxa aumenta o estímulo.
+Flexora em pé|Posterior||Máquina|legcurl|bI|Unilateral: foco em uma perna por vez.
+Flexão nórdica|Posterior|Glúteos|Peso corporal|legcurl|dR|Muito exigente; só para quem já tem boa força de posterior.
+Pull-through|Posterior|Glúteos|Cabo|hinge|bI|Aprende o movimento de quadril e treina glúteos e posterior.
+Kettlebell swing|Posterior|Glúteos,Ombros|Kettlebell|kbswing|bC|Força e condicionamento. A força vem do quadril, não dos braços.
+Elevação pélvica|Glúteos|Posterior,Quadríceps|Barra|hipthrust|oC|O melhor exercício de glúteo para carga alta. Apoio nas costas num banco.
+Elevação pélvica na máquina|Glúteos|Posterior|Máquina|hipthrust|oM|Versão guiada e confortável.
+Ponte de glúteos|Glúteos|Posterior|Peso corporal|hipthrust|bP|Bom para aquecer e para começar; progride para a elevação pélvica com peso.
+Elevação pélvica unilateral|Glúteos|Posterior|Peso corporal|hipthrust|bC|Uma perna de cada vez: aumenta a dificuldade sem precisar de peso.
+Passada|Glúteos|Quadríceps,Posterior|Halteres|lunge|oC|Caminhando com passos largos: glúteos e quadríceps com pegada de equilíbrio.
+Passada reversa|Glúteos|Quadríceps|Halteres|lunge|oC|Passo para trás: mais amigável ao joelho.
+Cadeira abdutora|Glúteos||Máquina|abduct|bI|Glúteo médio: ajuda na estabilidade do quadril.
+Cadeira adutora|Glúteos|Posterior|Máquina|abduct|bI|Parte interna da coxa.
+Coice no cabo|Glúteos||Cabo|glutekick|bI|Isola o glúteo; mantenha o quadril parado.
+Coice na máquina|Glúteos||Máquina|glutekick|bM|Guiado e confortável.
+Abdução de quadril no cabo|Glúteos||Cabo|abduct|bI|Em pé, perna para o lado, sem balançar o tronco.
+Caminhada lateral com elástico|Glúteos||Elástico|abduct|bI|Aquece e fortalece o glúteo médio.
+Panturrilha em pé|Panturrilha||Máquina|calf|bI|Alongue bem embaixo e suba até ficar na ponta dos pés; pausa de 1 s em cima.
+Panturrilha sentado|Panturrilha||Máquina|calf_s|bI|Joelho dobrado trabalha o sóleo, por baixo da panturrilha.
+Panturrilha no degrau|Panturrilha||Peso corporal|calf|bP|Use um degrau para ter amplitude completa.
+Panturrilha no leg press|Panturrilha||Máquina|calf|bI|Boa opção com carga alta e com segurança.
+Esteira|Cardio|Glúteos,Quadríceps|Cardio|walk_inc|oL|Caminhada com inclinação de 8 a 12%: muito gasto calórico com baixo impacto nas articulações.
+Caminhada ao ar livre|Cardio||Cardio|walk|oL|Simples e eficiente. Passos diários ajudam muito no déficit.
+Bicicleta ergométrica|Cardio|Quadríceps|Cardio|bike|bL|Baixo impacto: boa para dias em que as pernas estão cansadas.
+Bicicleta intervalada|Cardio|Quadríceps|Cardio|bike|bL|Intervalos de 30 s fortes e 90 s leves: bom, mas cansa mais as pernas.
+Elíptico|Cardio||Cardio|walk|bL|Baixo impacto, mas gasta menos que a caminhada inclinada se feito em ritmo fraco.
+Remo ergométrico|Cardio|Costas,Quadríceps|Cardio|rower|oL|Corpo inteiro, baixo impacto e alto gasto calórico. Aprenda a técnica: pernas, tronco e braços.
+Escada|Cardio|Glúteos,Quadríceps|Cardio|stairs|bL|Gasta muito, mas é puxado para os joelhos; use em intervalos curtos.
+Subir escadas|Cardio|Glúteos,Quadríceps|Cardio|stairs|bL|Bom para o dia a dia: use sempre que puder.
+Corrida na esteira|Cardio|Quadríceps|Cardio|run|dH|Alto impacto: com seu peso atual sobrecarrega joelhos e tornozelos. Comece caminhando rápido e progrida aos poucos.
+Corrida ao ar livre|Cardio|Quadríceps|Cardio|run|dH|Alto impacto: introduza só depois de emagrecer um pouco, ou alterne caminhada e trote.
+Trote leve (intervalado)|Cardio|Quadríceps|Cardio|run|dH|Alterne 1 min de trote com 2 min de caminhada; progrida devagar.
+Pular corda|Cardio|Panturrilha|Cardio|rope|dH|Alto impacto nos tornozelos e joelhos; evite enquanto o peso estiver alto.
+Polichinelo|Cardio|Ombros|Peso corporal|jack|dH|Impacto repetitivo; prefira caminhada rápida.
+Burpee|Cardio|Peito,Quadríceps|Peso corporal|burpee|dH|Muito gasto, mas com alto impacto e risco de lesão para quem está com mais peso.
+Supino com pegada neutra (halteres)|Peito|Tríceps,Ombros|Halteres|bench|bC|Pegada neutra: mais confortável para os ombros.
+Press de peito no cabo|Peito|Ombros,Tríceps|Cabo|crossover|bI|Tensão constante; bom para finalizar o peito.
+Flexão com apoio nos joelhos|Peito|Tríceps,Ombros|Peso corporal|pushup|bP|Versão mais leve da flexão para começar e progredir.
+Puxada com pegada neutra|Costas|Bíceps|Cabo|pulldown|oM|Pegada neutra: confortável para o ombro e boa amplitude.
+Puxada unilateral no cabo|Costas|Bíceps|Cabo|pulldown|bM|Uma lado por vez, com boa amplitude.
+Remada com apoio no peito (halteres)|Costas|Bíceps,Ombros|Halteres|row_bent|oC|Banco inclinado apoiando o peito: tira a lombar do movimento e isola as costas.
+Remada unilateral no cabo|Costas|Bíceps|Cabo|row_seated|bM|Boa para corrigir diferenças entre os lados.
+Pulldown com corda|Costas||Cabo|strpull|bI|Isolador do dorsal; finalize puxando a corda até as coxas.
+Levantamento terra com halteres|Posterior|Costas,Glúteos|Halteres|hinge|oC|Mais fácil de aprender que o terra com barra.
+Desenvolvimento unilateral (halter)|Ombros|Tríceps,Abdômen|Halteres|ohpress|bC|Um braço por vez exige mais do core.
+Elevação lateral inclinada|Ombros||Halteres|latraise|bI|Apoiado de lado num banco inclinado: mais tensão na parte de baixo.
+Elevação frontal no cabo|Ombros|Peito|Cabo|frontraise|bI|Tensão constante, sem balanço.
+Elevação em Y no cabo|Ombros|Trapézio|Cabo|facepull|bI|Bom para ombro e parte alta das costas, com carga leve.
+Rosca unilateral no cabo|Bíceps||Cabo|curl|bI|Tensão constante e foco em um braço por vez.
+Rosca Bayesian (cabo)|Bíceps||Cabo|curl_incl|oI|Braço atrás do corpo: alonga o bíceps e dá forte estímulo.
+Tríceps coice no cabo|Tríceps||Cabo|kickback|bI|Tensão constante no final do movimento.
+Tríceps pulley inverso|Tríceps||Cabo|pushdown|bI|Pegada supinada: variação para mudar o estímulo.
+Tríceps deitado com halteres|Tríceps||Halteres|skull|bI|Variação do tríceps testa, mais confortável para os cotovelos.
+Suspensão na barra (dead hang)|Antebraço|Costas,Ombros|Peso corporal|pullup|bE|Pendurar na barra: pegada, ombro e descompressão da coluna.
+Prancha com elevação de perna|Abdômen|Glúteos|Peso corporal|plank|bE|Prancha com uma perna elevada: mais difícil e trabalha glúteos.
+Dead bug|Abdômen||Peso corporal|crunch|bE|Excelente para aprender a estabilizar o abdômen e a lombar.
+Hollow hold|Abdômen||Peso corporal|legraise|bE|Isometria de corpo inteiro: lombar no chão e pernas estendidas.
+Abdominal declinado|Abdômen||Peso corporal|crunch|bI|Banco declinado aumenta a dificuldade.
+Agachamento no caixote (box squat)|Quadríceps|Glúteos,Posterior|Barra|squat|bC|Sente no caixote para controlar a profundidade.
+Leg press com pés altos|Glúteos|Posterior,Quadríceps|Máquina|legpress|oM|Pés altos na plataforma: mais glúteos e posterior.
+Afundo lateral|Quadríceps|Glúteos|Halteres|lunge|bC|Trabalha o quadril e as coxas em outro plano de movimento.
+Stiff unilateral|Posterior|Glúteos|Halteres|hinge|bC|Uma perna de cada vez: equilíbrio e posterior de coxa.
+Mesa flexora unilateral|Posterior||Máquina|legcurl|bI|Uma perna de cada vez para corrigir diferenças.
+Panturrilha unilateral no degrau|Panturrilha||Halteres|calf|bI|Uma perna de cada vez, com halter na mão para progredir.
+Elevação de pontas dos pés (tibial)|Panturrilha||Peso corporal|calf|bP|Fortalece a parte da frente da canela e ajuda a prevenir lesões.
+Bicicleta ao ar livre|Cardio|Quadríceps,Glúteos|Cardio|bike|bL|Baixo impacto e divertido: ótimo para dias de descanso ativo.
+`;
+const EX_GROUPS = ['Peito', 'Costas', 'Ombros', 'Trapézio', 'Bíceps', 'Tríceps', 'Antebraço', 'Abdômen', 'Quadríceps', 'Posterior', 'Glúteos', 'Panturrilha', 'Cardio'];
+const EX_UPPER = ['Peito', 'Costas', 'Ombros', 'Trapézio', 'Bíceps', 'Tríceps', 'Antebraço'], EX_LOWER = ['Quadríceps', 'Posterior', 'Glúteos', 'Panturrilha'];
+const EX_EQUIP = ['Barra', 'Halteres', 'Máquina', 'Cabo', 'Peso corporal', 'Smith', 'Kettlebell', 'Elástico', 'Cardio'];
+const EQ_KIND = {Barra: 'bb', Smith: 'bb', Halteres: 'db', Kettlebell: 'kb', Máquina: 'h', Cabo: 'cable', Elástico: 'h'};
+const RATE = {o: ['Ótimo', 'o'], b: ['Bom', 'b'], d: ['Depende', 'd']};
+const EXS = EX_RAW.trim().split('\n').map(l => {
+  const [n, g, s, e, p, rt, note] = l.split('|');
+  return {n, g, s: s ? s.split(',') : [], e, p, r: rt[0], t: rt[1], note: note || '', id: slug(n)};
+});
+const EX_BY = Object.fromEntries(EXS.map(x => [x.n, x]));
+const exByName = n => EX_BY[n] || null;
+/* motivo do selo, de acordo com o objetivo (emagrecer + ganhar massa) */
+const WHY = {
+  oC: 'Multiarticular com carga alta: recruta muito músculo, gera forte estímulo de crescimento e gasta mais calorias. Base do treino.',
+  oM: 'Guiado e seguro: permite carga alta e treinar perto da falha com pouco risco. Ótimo custo-benefício.',
+  oP: 'Movimento composto com o peso do corpo (e você já tem uma boa carga): muito estímulo, sem precisar de equipamento.',
+  oI: 'Isolador de alto retorno e baixo risco: grande estímulo no músculo-alvo.',
+  oL: 'Cardio de baixo impacto e alto gasto calórico: ajuda no déficit sem atrapalhar a recuperação da musculação.',
+  bC: 'Funciona bem, mas há opções mais eficientes. Boa como segunda ou terceira escolha do treino.',
+  bM: 'Boa para volume e para chegar perto da falha com segurança; complementa os compostos.',
+  bI: 'Isolador eficaz para volume e detalhe, mas gasta pouca energia. Use depois dos exercícios compostos.',
+  bP: 'Bom, de fácil acesso e baixo risco. Ajuste a dificuldade para fazer a série perto da falha.',
+  bL: 'Cardio de baixo impacto, bom para o déficit. Menos eficiente que a caminhada inclinada, mas útil para variar.',
+  bE: 'Fortalece o core e a estabilidade, mas queima pouca caloria. Use como complemento.',
+  dR: 'Eficaz para alguns, mas exige técnica muito boa e pode sobrecarregar ombro, lombar ou joelho. Só se você dominar o movimento.',
+  dH: 'Alto impacto: com o seu peso atual sobrecarrega joelhos e tornozelos. Prefira caminhada inclinada, bicicleta ou remo até emagrecer mais.',
+  dP: 'Muito difícil ou arriscado com o peso do corpo atual. Use uma versão assistida ou alternativa.',
+  dS: 'Retorno baixo para emagrecer e ganhar massa ou depende de objetivo específico. Existem opções melhores.',
+};
+const why = x => WHY[x.r + x.t] || WHY[x.r + 'C'] || '';
+
 /* ================= VIEWS ================= */
 const VIEWS = {};
 const pct = (v, m) => clamp(v / (m || 1) * 100, 0, 100);
@@ -1584,7 +1996,10 @@ VIEWS.diario = () => {
 function exName(type) { return (EX_TYPES.find(x => x.id === type) || {}).n || type; }
 VIEWS.treino = () => {
   const sub = subOf('treino', 'reg');
-  const head = `<div class="top"><div><h1>Treinos e atividades</h1><div class="mut">Registre caminhadas, corridas e musculação, e monte sua agenda de academia.</div></div></div>` + subTabs('treino', [['reg', '📝 Registrar'], ['agenda', '📅 Agenda'], ['rotinas', '🏋️ Meus treinos'], ['hist', '📈 Histórico']]);
+  const head = `<div class="top"><div><h1>Treinos e atividades</h1><div class="mut">Registre caminhadas, corridas e musculação, e monte sua agenda de academia.</div></div></div>` + subTabs('treino', [['reg', '📝 Registrar'], ['agenda', '📅 Agenda'], ['rotinas', '🏋️ Meus treinos'], ['lib', '📚 Exercícios'], ['plano', '🗓️ Plano'], ['recs', '✅ Recomendações'], ['hist', '📈 Histórico']]);
+  if (sub === 'lib') return head + libView();
+  if (sub === 'plano') return head + planView();
+  if (sub === 'recs') return head + recsView();
   if (sub === 'reg') {
     const wk = weekStart(TODAY()), list = S.exercises.filter(e => e.d >= wk), mins = sum(list, e => e.min), km = sum(list, e => e.km), kc = sum(list, e => e.kcal);
     const opts = EX_TYPES.map(x => `<option value="${x.id}">${x.icon} ${x.n}</option>`).join('');
@@ -1607,7 +2022,7 @@ VIEWS.treino = () => {
   if (sub === 'rotinas') {
     return head + `<div class="row" style="margin-bottom:12px"><button class="btn pri" data-act="newRoutine">+ Criar treino</button><select id="tpl" style="width:auto"><option value="">Importar modelo…</option>${TEMPLATES.map((t, i) => `<option value="${i}">${esc(t.n)}</option>`).join('')}</select></div>
       <div class="note" style="margin-bottom:12px">Os modelos são genéricos para ajudar a começar. Ajuste cargas e exercícios com um profissional de educação física, principalmente se você tem dores ou lesões.</div>
-      <div class="grid">${S.routines.length ? S.routines.map(r => `<div class="card c6"><div class="row between"><h3>${esc(r.name)}</h3><div class="row"><button class="btn sm" data-act="editRoutine" data-id="${r.id}">Editar</button><button class="btn sm pri" data-act="startRoutine" data-id="${r.id}">▶</button></div></div>${r.items.map(it => `<div class="kv"><span>${esc(it.ex)}</span><span class="mut">${it.sets}x${esc(it.reps)}${it.load ? ' · ' + it.load + ' kg' : ''}</span></div>`).join('')}</div>`).join('') : '<div class="card c12 empty">Nenhum treino criado. Use “Criar treino” ou importe um modelo.</div>'}</div>`;
+      <div class="grid">${S.routines.length ? S.routines.map(r => `<div class="card c6"><div class="row between"><h3>${esc(r.name)}</h3><div class="row"><button class="btn sm" data-act="editRoutine" data-id="${r.id}">Editar</button><button class="btn sm pri" data-act="startRoutine" data-id="${r.id}">▶</button></div></div>${r.items.map(it => `<div class="kv"><span class="row" style="gap:8px">${exThumbByName(it.ex)}${esc(it.ex)}</span><span class="mut">${it.sets}x${esc(it.reps)}${it.load ? ' · ' + it.load + ' kg' : ''}</span></div>`).join('')}</div>`).join('') : '<div class="card c12 empty">Nenhum treino criado. Use “Criar treino” ou importe um modelo.</div>'}</div>`;
   }
   // histórico
   const wks = Array.from({length: 8}, (_, i) => addDays(weekStart(TODAY()), -7 * (7 - i)));
@@ -1863,16 +2278,16 @@ function renderSession() {
   const s = SESSION; if (!s) return;
   modal(`<div class="row between"><div><h2>${esc(s.name)}</h2><small class="mut">Marque as séries concluídas e informe as cargas (kg).</small></div><button class="btn sm ghost" data-act="cancelSession">✕</button></div>
   <div class="row" style="margin:10px 0"><b>⏱ Descanso:</b>${[45, 60, 90, 120].map(v => `<button class="btn sm" data-act="rest" data-v="${v}">${v}s</button>`).join('')}<b id="rest-out" style="color:var(--acc)"></b></div>
-  ${s.items.map((it, i) => `<div class="card" style="margin-bottom:10px"><b>${esc(it.ex)}</b> <small class="mut">meta: ${esc(it.target)} reps</small>${it.sets.map((st, j) => `<div class="set"><span class="mut">${j + 1}</span><input type="number" inputmode="decimal" placeholder="reps" value="${st.reps}" data-chg="setReps" data-i="${i}" data-j="${j}"><input type="number" inputmode="decimal" placeholder="kg" value="${st.load}" data-chg="setLoad" data-i="${i}" data-j="${j}"><input type="checkbox" ${st.done ? 'checked' : ''} data-chg="setDone" data-i="${i}" data-j="${j}"></div>`).join('')}</div>`).join('')}
+  ${s.items.map((it, i) => `<div class="card" style="margin-bottom:10px"><div class="row" style="gap:10px;align-items:center">${exThumbByName(it.ex)}<div><b>${esc(it.ex)}</b> <small class="mut">meta: ${esc(it.target)} reps</small>${(() => { const x = exByName(it.ex), p = x && exProg(x); return p ? `<br><small style="color:var(--acc)">📈 ${esc(p.next)}</small>` : ''; })()}</div></div>${it.sets.map((st, j) => `<div class="set"><span class="mut">${j + 1}</span><input type="number" inputmode="decimal" placeholder="reps" value="${st.reps}" data-chg="setReps" data-i="${i}" data-j="${j}"><input type="number" inputmode="decimal" placeholder="kg" value="${st.load}" data-chg="setLoad" data-i="${i}" data-j="${j}"><input type="checkbox" ${st.done ? 'checked' : ''} data-chg="setDone" data-i="${i}" data-j="${j}"></div>`).join('')}</div>`).join('')}
   <div class="row between"><button class="btn" data-act="cancelSession">Cancelar</button><button class="btn pri" data-act="finishSession">Concluir treino</button></div>`, true);
 }
 function renderRoutineEditor() {
-  const r = RE; const groups = Object.entries(GYM).map(([g, a]) => `<optgroup label="${g}">${a.map(x => `<option>${esc(x)}</option>`).join('')}</optgroup>`).join('');
+  const r = RE;
   modal(`<div class="row between"><h2>${r.id ? 'Editar treino' : 'Novo treino'}</h2><button class="btn sm ghost" data-act="closeModal">✕</button></div>
    <div class="stack"><div><label>Nome do treino</label><input id="re-name" value="${esc(r.name)}" placeholder="Ex.: Treino A — Peito e tríceps" data-chg="reName"></div>
-   ${r.items.map((it, i) => `<div class="card" style="padding:10px"><div class="row between"><b>${esc(it.ex)}</b><div class="row"><button class="btn sm ghost" data-act="reUp" data-i="${i}">↑</button><button class="btn sm ghost" data-act="reDown" data-i="${i}">↓</button><button class="btn sm ghost bad" data-act="reDel" data-i="${i}">✕</button></div></div>
+   ${r.items.map((it, i) => `<div class="card" style="padding:10px"><div class="row between"><span class="row" style="gap:8px">${exThumbByName(it.ex)}<b>${esc(it.ex)}</b> ${exByName(it.ex) ? rateBadge(exByName(it.ex)) : ''}</span><div class="row"><button class="btn sm ghost" data-act="reUp" data-i="${i}">↑</button><button class="btn sm ghost" data-act="reDown" data-i="${i}">↓</button><button class="btn sm ghost bad" data-act="reDel" data-i="${i}">✕</button></div></div>
      <div class="form" style="grid-template-columns:repeat(3,1fr)"><div><label>Séries</label><input type="number" value="${it.sets}" data-chg="reSets" data-i="${i}"></div><div><label>Repetições</label><input value="${esc(it.reps)}" data-chg="reReps" data-i="${i}"></div><div><label>Carga (kg)</label><input type="number" inputmode="decimal" value="${it.load || ''}" data-chg="reLoad" data-i="${i}"></div></div></div>`).join('')}
-   <div class="row"><select id="re-ex" class="grow"><option value="">+ escolher exercício…</option>${groups}</select><input id="re-custom" placeholder="ou digite um exercício" class="grow"><button class="btn" data-act="reAdd">Adicionar</button></div>
+   <div class="row"><button class="btn pri" data-act="reLib">📚 Escolher da biblioteca (imagens e filtros)</button></div><div class="row"><input id="re-custom" placeholder="ou digite um exercício" class="grow"><button class="btn" data-act="reAdd">Adicionar</button></div>
    <div class="row between"><button class="btn bad" data-act="reRemove" ${r.id ? '' : 'style="visibility:hidden"'}>Excluir treino</button><button class="btn pri" data-act="reSave">Salvar treino</button></div></div>`, true);
 }
 function renderDietEditor() {
@@ -1965,7 +2380,7 @@ const ACT = {
   },
   newRoutine: () => { RE = {name: '', items: []}; renderRoutineEditor(); },
   editRoutine: a => { RE = JSON.parse(JSON.stringify(S.routines.find(r => r.id === a.dataset.id))); renderRoutineEditor(); },
-  reAdd: () => { const ex = $('#re-custom').value.trim() || $('#re-ex').value; if (!ex) return; RE.name = $('#re-name').value; RE.items.push({ex, sets: 3, reps: '10', load: ''}); renderRoutineEditor(); },
+  reAdd: () => { const ex = $('#re-custom').value.trim(); if (!ex) return toast('Digite o nome ou use a biblioteca'); RE.name = $('#re-name').value; RE.items.push(newItem(ex)); renderRoutineEditor(); },
   reDel: a => { RE.items.splice(+a.dataset.i, 1); renderRoutineEditor(); },
   reUp: a => { const i = +a.dataset.i; if (i > 0) { [RE.items[i - 1], RE.items[i]] = [RE.items[i], RE.items[i - 1]]; renderRoutineEditor(); } },
   reDown: a => { const i = +a.dataset.i; if (i < RE.items.length - 1) { [RE.items[i + 1], RE.items[i]] = [RE.items[i], RE.items[i + 1]]; renderRoutineEditor(); } },
@@ -2117,6 +2532,293 @@ ACT.obSave = () => {
 
 
 
+/* ================= TREINO: BIBLIOTECA, PLANO, RECOMENDAÇÕES ================= */
+const POSE_TIP = {
+  bench: 'Deite com os pés firmes no chão e as escápulas juntas. Desça a carga até o peito de forma controlada e empurre para cima sem travar os cotovelos.',
+  incline: 'Banco entre 30° e 45°. Desça até a parte alta do peito e empurre em linha reta; não deixe os ombros subirem em direção às orelhas.',
+  chestpress: 'Costas coladas no encosto, empurre sem tirar o ombro do apoio. Volte devagar, sentindo o peito alongar.',
+  fly: 'Cotovelos levemente flexionados e fixos. Abra até sentir o peito alongar e feche como se abraçasse uma árvore.',
+  pec: 'Costas no encosto, cotovelos na altura do peito. Feche apertando o peito e controle a volta.',
+  crossover: 'Tronco levemente inclinado à frente. Traga as mãos juntas à frente do corpo, apertando o peito, e volte devagar.',
+  pushup: 'Corpo em linha reta da cabeça aos pés, abdômen contraído. Desça o peito perto do chão e empurre sem arquear a lombar.',
+  dips: 'Desça até os cotovelos formarem 90° e suba sem travar. Se faltar força, use a versão assistida.',
+  pulldown: 'Peito para frente, puxe a barra até a altura do queixo levando os cotovelos para baixo e para trás. Não balance o tronco.',
+  strpull: 'Braços quase retos, puxe a barra até as coxas apertando o dorsal. Mantenha o tronco firme.',
+  pullup: 'Pegada um pouco mais larga que os ombros. Puxe o peito em direção à barra e desça controlando até esticar os braços.',
+  row_seated: 'Costas retas, puxe o cabo até o abdômen levando os cotovelos para trás e apertando as escápulas. Volte devagar.',
+  row_bent: 'Joelhos levemente flexionados e tronco inclinado com a coluna neutra. Puxe em direção ao abdômen, cotovelo junto ao corpo.',
+  hinge: 'Quadril para trás, coluna neutra, barra perto das pernas. Suba empurrando o quadril à frente até ficar em pé, sem hiperestender a lombar.',
+  hyper: 'Corpo alinhado da cabeça aos pés no topo; desça controlando, sem arredondar a coluna.',
+  ohpress: 'Glúteos e abdômen contraídos, empurre a carga em linha reta acima da cabeça. Não arqueie a lombar.',
+  ohpress_s: 'Costas apoiadas, empurre a carga para cima sem travar os cotovelos. Desça até a altura das orelhas.',
+  latraise: 'Cotovelos levemente flexionados, suba até a altura dos ombros e desça devagar. Sem balançar o corpo.',
+  frontraise: 'Suba até a altura dos olhos, sem usar impulso. Desça controlando.',
+  rdelt: 'Incline o tronco à frente e abra os braços para os lados, levando os cotovelos para trás. Carga leve e controle.',
+  facepull: 'Puxe a corda em direção ao rosto, abrindo os cotovelos para os lados e apertando as escápulas.',
+  upright: 'Pegada na largura dos ombros, suba até o meio do peito. Pare se sentir dor no ombro.',
+  shrug: 'Suba os ombros em direção às orelhas, segure 1 s e desça devagar. Não gire os ombros.',
+  curl: 'Cotovelos junto ao corpo, suba apertando o bíceps e desça controlando. Sem balançar o tronco.',
+  curl_incl: 'Costas apoiadas e braços pendurados para alongar o bíceps. Suba sem mexer os ombros.',
+  pushdown: 'Cotovelos colados ao corpo, estenda os braços até o fim e volte devagar sem levantar os cotovelos.',
+  skull: 'Cotovelos apontando para o teto e fixos. Desça a carga em direção à testa e estenda.',
+  overhead_tri: 'Cotovelos apontando para cima, desça a carga atrás da cabeça e estenda sem abrir os cotovelos.',
+  kickback: 'Tronco inclinado e cotovelo junto ao corpo na altura das costas. Estenda o antebraço para trás e aperte o tríceps.',
+  wristcurl: 'Antebraços apoiados nas coxas com as palmas para cima. Mova só o punho, subindo e descendo devagar.',
+  carry: 'Costas retas, ombros para trás, passos curtos. Segure os pesos firmes durante todo o percurso.',
+  plank: 'Corpo em linha reta, glúteos e abdômen contraídos. Respire normalmente e não deixe o quadril cair.',
+  crunch: 'Lombar no chão, enrole o tronco subindo as costelas em direção ao quadril. Não puxe o pescoço.',
+  legraise: 'Lombar colada ao chão. Suba as pernas juntas e desça devagar sem encostar no chão.',
+  hangraise: 'Pendurado, suba os joelhos ou as pernas sem balançar. Controle a descida.',
+  vsit: 'Equilibre-se nos glúteos, tronco e pernas formando um V. Gire o tronco ou aproxime pernas e tronco, controlando.',
+  cablecrunch: 'Ajoelhado, quadril parado. Flexione a coluna trazendo os cotovelos em direção aos joelhos.',
+  mclimb: 'Posição de flexão, abdômen contraído. Alterne os joelhos em direção ao peito em ritmo controlado.',
+  squat: 'Pés na largura dos ombros, joelhos acompanhando a ponta dos pés. Desça até as coxas ficarem paralelas ao chão com a coluna neutra e suba empurrando o chão.',
+  goblet: 'Segure o peso junto ao peito. Desça mantendo o tronco ereto, cotovelos entre os joelhos, e suba empurrando o chão.',
+  bulgarian: 'Pé de trás apoiado num banco. Desça na vertical até a coxa da frente ficar paralela ao chão e suba empurrando com o calcanhar.',
+  lunge: 'Passo largo à frente, tronco ereto. Desça até os dois joelhos formarem 90° e volte empurrando com o pé da frente.',
+  stepup: 'Pé inteiro na caixa; suba empurrando com a perna da frente, sem impulso da perna de trás.',
+  legpress: 'Costas e quadril colados no banco. Desça até os joelhos formarem 90° e empurre sem travar os joelhos.',
+  legext: 'Costas no encosto. Estenda as pernas até quase retas, segure 1 s e desça devagar.',
+  legcurl: 'Quadril colado ao banco. Flexione as pernas trazendo o calcanhar em direção ao glúteo e volte devagar.',
+  hipthrust: 'Costas apoiadas no banco, pés no chão. Suba o quadril apertando os glúteos até o tronco ficar alinhado com as coxas.',
+  calf: 'Desça o calcanhar até alongar a panturrilha e suba na ponta dos pés, com pausa de 1 s no topo.',
+  calf_s: 'Joelhos a 90°. Suba os calcanhares o máximo possível e desça alongando.',
+  abduct: 'Abra as pernas contra a resistência sem balançar o tronco e volte devagar.',
+  glutekick: 'Quadril estável, estenda a perna para trás apertando o glúteo e volte sem arquear a lombar.',
+  thruster: 'Agache com os halteres nos ombros e suba empurrando-os acima da cabeça em um só movimento.',
+  kbswing: 'Quadril para trás e empurre à frente com força: o kettlebell sobe pelo impulso do quadril, não dos braços.',
+  walk: 'Postura ereta, passos naturais e braços soltos. Ritmo em que ainda dá para conversar.',
+  walk_inc: 'Inclinação de 8 a 12% e velocidade de 4 a 5,5 km/h. Evite se segurar na esteira para não reduzir o gasto.',
+  run: 'Comece alternando trote e caminhada. Cadência curta e pisada leve.',
+  bike: 'Selim na altura do quadril, pedale com resistência moderada, sem balançar o corpo.',
+  rower: 'Sequência: empurre com as pernas, incline o tronco e puxe com os braços. Volte na ordem inversa.',
+  stairs: 'Suba com o pé inteiro no degrau, tronco ereto e sem se apoiar demais nos corrimãos.',
+  jack: 'Abra pernas e braços ao mesmo tempo e feche. Aterrisse leve.',
+  rope: 'Pulos pequenos, cotovelos junto ao corpo e movimento vindo dos punhos.',
+  burpee: 'Agache, apoie as mãos, estenda as pernas, volte e levante. Em ritmo controlado.',
+};
+const exTip = x => POSE_TIP[x.p] || 'Movimento controlado, amplitude completa e respiração constante.';
+/* --- recomendação por exercício (séries, repetições, descanso) --- */
+function exRec(x) {
+  if (x.g === 'Cardio') return x.t === 'H' ? {sets: '—', reps: 'Intervalos de 1 min', rest: 'Caminhe 2 min entre eles', len: '10 a 20 min no total', note: 'Só depois que o peso e as articulações permitirem.'} : {sets: '—', reps: '20 a 40 min', rest: '—', len: 'Ritmo em que ainda dá para conversar', note: 'Faça 3 a 4 vezes por semana, de preferência em dias sem pernas pesadas.'};
+  if (x.t === 'E') return {sets: '3', reps: x.p === 'plank' ? '30 a 60 s' : '12 a 20', rest: '45 a 60 s', note: 'Qualidade acima de quantidade.'};
+  if (x.t === 'C') return {sets: '3 a 4', reps: '6 a 10', rest: '2 a 3 min', note: 'Termine cada série com 1 a 3 repetições sobrando.'};
+  if (x.t === 'M') return {sets: '3', reps: '8 a 12', rest: '90 s a 2 min', note: 'Termine com 1 a 2 repetições sobrando.'};
+  if (x.t === 'P') return {sets: '3', reps: '8 a 15', rest: '90 s', note: 'Ajuste a dificuldade para não passar de 15 repetições.'};
+  if (x.t === 'R') return {sets: '3', reps: '8 a 10', rest: '2 min', note: 'Comece leve e priorize a técnica.'};
+  return {sets: '3', reps: '10 a 15', rest: '60 a 90 s', note: 'Pode ir mais perto da falha nas últimas séries.'};
+}
+const repRange = r => { const m = String(r).match(/(\d+)\D+(\d+)/); return m ? [+m[1], +m[2]] : [8, 12]; };
+/* --- carga inicial estimada (fração do peso de referência) --- */
+const LOAD = {
+  'Supino reto (barra)': [.4, .65], 'Supino reto (halteres)': [.14, .24, 'mão'], 'Supino inclinado (barra)': [.35, .55], 'Supino inclinado (halteres)': [.12, .2, 'mão'], 'Supino reto na máquina': [.35, .6], 'Voador (peck deck)': [.2, .35], 'Crucifixo': [.05, .1, 'mão'], 'Crossover': [.1, .2, 'lado'], 'Supino fechado': [.3, .5],
+  'Puxada frontal': [.4, .65], 'Remada baixa': [.4, .65], 'Remada curvada': [.35, .55], 'Remada unilateral (serrote)': [.15, .28, 'mão'], 'Pull-down': [.25, .4], 'Remada na máquina': [.35, .6],
+  'Desenvolvimento (halteres)': [.1, .18, 'mão'], 'Desenvolvimento (barra em pé)': [.25, .4], 'Desenvolvimento na máquina': [.25, .45], 'Elevação lateral': [.04, .08, 'mão'], 'Crucifixo inverso': [.03, .07, 'mão'], 'Face pull': [.15, .3], 'Encolhimento (halteres)': [.2, .35, 'mão'],
+  'Rosca direta': [.2, .35], 'Rosca alternada': [.08, .14, 'mão'], 'Rosca martelo': [.08, .15, 'mão'], 'Rosca inclinada': [.06, .12, 'mão'],
+  'Tríceps corda (polia)': [.2, .35], 'Tríceps testa': [.15, .3], 'Tríceps francês': [.1, .2],
+  'Agachamento livre': [.6, 1], 'Leg press 45°': [1, 1.8], 'Hack squat': [.6, 1.1], 'Agachamento goblet': [.15, .3], 'Agachamento búlgaro': [.1, .2, 'mão'], 'Afundo': [.1, .2, 'mão'], 'Cadeira extensora': [.3, .55],
+  'Stiff': [.45, .8], 'Mesa flexora': [.25, .45], 'Cadeira flexora': [.3, .5], 'Levantamento terra': [.7, 1.2], 'Elevação pélvica': [.6, 1.2], 'Panturrilha em pé': [.6, 1.1], 'Panturrilha sentado': [.4, .8], 'Abdominal no cabo': [.2, .4],
+};
+const refKg = () => { try { return targets().ref || curWeight() * .85; } catch (e) { return (curWeight() || 100) * .85; } };
+const rnd = (v, s) => Math.round(v / s) * s;
+function exLoadText(x) {
+  const l = LOAD[x.n]; if (!l) return '';
+  const ref = refKg(), step = l[2] === 'mão' || l[2] === 'lado' ? 2 : 2.5;
+  const lo = Math.max(step, rnd(ref * l[0], step)), hi = Math.max(lo, rnd(ref * l[1], step));
+  return `${fmt(lo, 1)} a ${fmt(hi, 1)} kg${l[2] ? ' por ' + l[2] : ''}`;
+}
+function exProg(x) {
+  const hist = (S.lifts || []).filter(l => l.ex === x.n).sort((a, b) => a.d < b.d ? -1 : 1), last = hist[hist.length - 1];
+  if (!last) return null;
+  const [lo, hi] = repRange(exRec(x).reps), sets = last.sets.filter(s => +s.reps > 0), ld = Math.max(...sets.map(s => +s.load || 0));
+  if (!sets.length || !(ld > 0)) return null;
+  const allTop = sets.every(s => +s.reps >= hi), anyLow = sets.some(s => +s.reps < lo);
+  const txt = last.sets.map(s => (s.reps || '-') + '×' + (s.load || 0)).join(' · ');
+  if (allTop) { const nl = rnd(ld * 1.05, ld >= 40 ? 2.5 : 1) > ld ? rnd(ld * 1.05, ld >= 40 ? 2.5 : 1) : ld + 1; return {last: `${dmy(last.d)}: ${txt} kg`, next: `Bateu o topo das repetições: suba para ${fmt(nl, 1)} kg e volte a ${lo} repetições.`}; }
+  if (anyLow) return {last: `${dmy(last.d)}: ${txt} kg`, next: `Ficou abaixo de ${lo} repetições: mantenha ${fmt(ld, 1)} kg ou reduza cerca de 5%.`};
+  return {last: `${dmy(last.d)}: ${txt} kg`, next: `Mantenha ${fmt(ld, 1)} kg e tente 1 repetição a mais em cada série, até chegar a ${hi}.`};
+}
+/* --- visual --- */
+const rateBadge = (x, full) => `<span class="rate r-${x.r}" title="${esc(why(x))}">${RATE[x.r][0]}</span>`;
+const exKind = x => x ? EQ_KIND[x.e] || '' : '';
+const exImg = (x, big) => exPair(x ? x.p : 'stand', exKind(x), big);
+const exThumbByName = (n) => { const x = exByName(n); return x ? `<div class="exmini">${exFrame(x.p, 'a', exKind(x))}${exFrame(x.p, 'b', exKind(x))}</div>` : ''; };
+function exCard(x, act, secondary) {
+  return `<div class="excard r-${x.r}" data-act="${act || 'exOpen'}" data-n="${esc(x.n)}">${exImg(x)}<div class="exb"><b>${esc(x.n)}</b><div class="row" style="gap:6px;margin-top:4px">${rateBadge(x)}<span class="pill">${secondary ? 'secundário: ' : ''}${esc(x.g)}</span>${x.e !== x.g ? `<span class="pill">${esc(x.e)}</span>` : ''}</div></div></div>`;
+}
+const LIB = {g: 'Todos', e: '', r: '', q: ''}, XP = {g: 'Todos', e: '', r: '', q: ''};
+const rankR = {o: 0, b: 1, d: 2};
+function filterEx(F) {
+  const q = norm(F.q || '');
+  let list = EXS.filter(x => (!F.e || x.e === F.e) && (!F.r || x.r === F.r) && (!q || norm(x.n + ' ' + x.g + ' ' + x.s.join(' ') + ' ' + x.e).includes(q)));
+  if (F.g !== 'Todos') {
+    const grp = F.g === 'Superior' ? EX_UPPER : F.g === 'Inferior' ? EX_LOWER : [F.g];
+    const prim = list.filter(x => grp.includes(x.g)), sec = list.filter(x => !grp.includes(x.g) && x.s.some(s => grp.includes(s)));
+    const by = (a, b) => rankR[a.r] - rankR[b.r];
+    return {prim: prim.sort(by), sec: sec.sort(by)};
+  }
+  return {prim: list.sort((a, b) => rankR[a.r] - rankR[b.r] || EX_GROUPS.indexOf(a.g) - EX_GROUPS.indexOf(b.g)), sec: []};
+}
+function exGrid(F, act) {
+  const {prim, sec} = filterEx(F);
+  if (!prim.length && !sec.length) return '<div class="empty c12">Nenhum exercício com esses filtros.</div>';
+  return prim.map(x => exCard(x, act)).join('') + (sec.length ? `<div class="c12 mut" style="grid-column:1/-1;margin-top:6px"><b>Também trabalham ${esc(F.g.toLowerCase())}</b> (como músculo secundário)</div>` + sec.map(x => exCard(x, act, true)).join('') : '');
+}
+function exFilters(F, p) {
+  const gs = ['Todos', 'Superior', 'Inferior', ...EX_GROUPS];
+  return `<div class="tabs" style="flex-wrap:wrap">${gs.map(g => `<span class="chip ${F.g === g ? 'on' : ''}" data-act="${p}G" data-g="${g}">${g}</span>`).join('')}</div>
+  <div class="row" style="margin:10px 0">${[['', 'Todos os selos'], ['o', '🟢 Ótimo'], ['b', '🟡 Bom'], ['d', '🔴 Depende']].map(([k, l]) => `<span class="chip ${F.r === k ? 'on' : ''}" data-act="${p}R" data-r="${k}">${l}</span>`).join('')}
+  <select id="${p}-e" style="width:auto"><option value="">Todos os equipamentos</option>${EX_EQUIP.map(e => `<option ${F.e === e ? 'selected' : ''}>${e}</option>`).join('')}</select>
+  <input id="${p}-q" placeholder="🔎 buscar exercício…" value="${esc(F.q)}" class="grow" style="min-width:160px"></div>`;
+}
+const legend = () => `<div class="note" style="margin-bottom:12px"><span class="rate r-o">Ótimo</span> melhor retorno para emagrecer e ganhar massa · <span class="rate r-b">Bom</span> funciona bem, use como complemento · <span class="rate r-d">Depende</span> só em certas condições (técnica, impacto ou peso do corpo). Toque no selo ou no exercício para ver o motivo.</div>`;
+/* sugestões */
+function suggestEx() {
+  const today = (S.schedule || {})[new Date().getDay()], rt = today && S.routines.find(r => r.id === today.routine);
+  if (rt) {
+    const have = new Set(rt.items.map(i => i.ex)), gs = [...new Set(rt.items.map(i => (exByName(i.ex) || {}).g).filter(Boolean))].filter(g => g !== 'Cardio');
+    const out = []; gs.forEach(g => EXS.filter(x => x.g === g && x.r === 'o' && !have.has(x.n)).slice(0, 2).forEach(x => out.push(x)));
+    if (out.length) return {title: `Para completar o treino de hoje (${rt.name})`, list: out.slice(0, 8)};
+  }
+  const top = ['Agachamento livre', 'Levantamento terra', 'Supino reto (halteres)', 'Remada curvada', 'Puxada frontal', 'Desenvolvimento (halteres)', 'Elevação pélvica', 'Esteira'];
+  return {title: 'Os melhores para emagrecer e ganhar massa', list: top.map(exByName).filter(Boolean)};
+}
+function libView() {
+  const sg = suggestEx();
+  return `<div class="card" style="margin-bottom:14px"><h3>💡 ${esc(sg.title)}</h3><div class="exrow">${sg.list.map(x => exCard(x)).join('')}</div></div>
+   ${legend()}${exFilters(LIB, 'lib')}<div class="exgrid" id="lib-grid">${exGrid(LIB)}</div>`;
+}
+function exDetail(name) {
+  const x = exByName(name); if (!x) return;
+  const rec = exRec(x), load = exLoadText(x), pr = exProg(x);
+  const alts = EXS.filter(y => y.n !== x.n && y.g === x.g && y.r !== 'd' && (y.e !== x.e || y.p !== x.p)).sort((a, b) => rankR[a.r] - rankR[b.r]).slice(0, 4);
+  modal(`<div class="row between"><div><h2>${esc(x.n)}</h2><div class="row" style="gap:6px">${rateBadge(x)}<span class="pill">${esc(x.g)}</span>${x.e !== x.g ? `<span class="pill">${esc(x.e)}</span>` : ''}${x.s.map(s => `<span class="pill">${esc(s)}</span>`).join('')}</div></div><button class="btn sm ghost" data-act="closeModal">✕</button></div>
+   ${exImg(x, true)}
+   <div class="note r-${x.r}" style="margin:10px 0"><b>Por que ${RATE[x.r][0].toLowerCase()}?</b> ${esc(why(x))}${x.note ? ' ' + esc(x.note) : ''}</div>
+   <div class="card" style="margin-bottom:10px"><h3>Como fazer</h3><div>${esc(exTip(x))}</div><small class="mut">Os desenhos mostram o início (esquerda) e o fim (direita) do movimento.</small></div>
+   <div class="card" style="margin-bottom:10px"><h3>Recomendação para você</h3>
+    <div class="kv"><span>Séries</span><b>${rec.sets}</b></div><div class="kv"><span>Repetições</span><b>${rec.reps}</b></div><div class="kv"><span>Descanso</span><b>${rec.rest}</b></div>
+    ${load ? `<div class="kv"><span>Carga inicial estimada</span><b>${load}</b></div>` : ''}${pr ? `<div class="kv"><span>Seu último treino</span><b>${esc(pr.last)}</b></div><div class="note" style="margin-top:8px">📈 ${esc(pr.next)}</div>` : ''}
+    <small class="mut">${esc(rec.len || rec.note)}${load ? ' A carga é só um ponto de partida: escolha a que permite terminar as repetições com 2 sobrando.' : ''}</small></div>
+   ${alts.length ? `<h3>Alternativas</h3><div class="exrow">${alts.map(y => exCard(y)).join('')}</div>` : ''}
+   <div class="row between" style="margin-top:12px"><button class="btn" data-act="closeModal">Fechar</button><button class="btn pri" data-act="exAddTo" data-n="${esc(x.n)}">＋ Adicionar a um treino</button></div>`, true);
+}
+function exAddTo(name) {
+  const x = exByName(name);
+  if (!S.routines.length) { const rec = x ? exRec(x) : {}; S.routines.push({id: uid(), name: 'Meu treino', items: [newItem(name)]}); save(); closeModal(); render(); return toast('Criei “Meu treino” com ' + name); }
+  modal(`<div class="row between"><h2>Adicionar a qual treino?</h2><button class="btn sm ghost" data-act="closeModal">✕</button></div><div class="stack">${S.routines.map(r => `<button class="btn" data-act="exAddRoutine" data-id="${r.id}" data-n="${esc(name)}">${esc(r.name)} <small class="mut">(${r.items.length} exercícios)</small></button>`).join('')}<button class="btn pri" data-act="exAddNew" data-n="${esc(name)}">＋ Novo treino com este exercício</button></div>`);
+}
+function newItem(name) {
+  const x = exByName(name), rec = x ? exRec(x) : {sets: '3', reps: '10'}, m = String(rec.sets).match(/\d+/);
+  return {ex: name, sets: m ? +m[0] : 3, reps: String(rec.reps || '10').replace(/\s*a\s*/, '-').replace(/ s$/, ' s'), load: ''};
+}
+/* picker usado no editor de treino */
+function openExPicker() {
+  modal(`<div class="row between"><h2>Escolher exercício</h2><button class="btn sm ghost" data-act="xpBack">← voltar ao treino</button></div>${exFilters(XP, 'xp')}<div class="exgrid" id="xp-grid" style="max-height:60vh;overflow:auto">${exGrid(XP, 'exPick')}</div>`, true);
+}
+/* --- plano semanal: 1 dia de pernas + superiores nos demais --- */
+const DAYS = {
+  PA: ['Superior A — Peito e costas (força)', [['Supino reto (barra)', 4, '6-8'], ['Remada curvada', 4, '6-8'], ['Supino inclinado (halteres)', 3, '8-10'], ['Puxada frontal', 3, '8-10'], ['Remada baixa', 3, '10'], ['Crossover', 2, '12-15'], ['Face pull', 3, '12-15']]],
+  PB: ['Superior B — Ombros e braços', [['Desenvolvimento (halteres)', 4, '8-10'], ['Elevação lateral', 4, '12-15'], ['Crucifixo inverso', 3, '12-15'], ['Rosca inclinada', 3, '10-12'], ['Tríceps francês', 3, '10-12'], ['Rosca martelo', 3, '10-12'], ['Tríceps corda (polia)', 3, '12-15'], ['Encolhimento (halteres)', 3, '12'], ['Panturrilha em pé', 3, '15']]],
+  PC: ['Superior C — Peito e costas (volume)', [['Supino inclinado (barra)', 3, '10-12'], ['Puxada frontal', 4, '10-12'], ['Supino reto (halteres)', 3, '10-12'], ['Remada unilateral (serrote)', 3, '10-12'], ['Voador (peck deck)', 3, '12-15'], ['Pull-down', 3, '12-15'], ['Abdominal no cabo', 3, '12-15'], ['Panturrilha em pé', 3, '15']]],
+  LEG: ['Pernas completas e core', [['Agachamento livre', 4, '6-10'], ['Leg press 45°', 3, '10-12'], ['Stiff', 4, '8-10'], ['Afundo', 3, '10-12'], ['Mesa flexora', 3, '10-12'], ['Cadeira extensora', 3, '12-15'], ['Elevação pélvica', 3, '8-12'], ['Panturrilha em pé', 4, '12-15'], ['Prancha', 3, '45 s']]],
+  PT: ['Peito e tríceps', [['Supino reto (barra)', 4, '6-10'], ['Supino inclinado (halteres)', 3, '8-12'], ['Crossover', 3, '12-15'], ['Mergulho assistido (máquina)', 3, '8-12'], ['Tríceps testa', 3, '10-12'], ['Tríceps corda (polia)', 3, '12-15']]],
+  CB: ['Costas e bíceps', [['Barra fixa assistida (máquina)', 4, '6-10'], ['Remada curvada', 4, '8-10'], ['Remada baixa', 3, '10-12'], ['Pull-down', 3, '12-15'], ['Face pull', 3, '15'], ['Rosca direta', 3, '8-12'], ['Rosca martelo', 3, '10-12']]],
+  OB: ['Ombros, trapézio e braços', [['Desenvolvimento (halteres)', 4, '8-10'], ['Elevação lateral', 4, '12-15'], ['Crucifixo inverso', 3, '12-15'], ['Encolhimento (halteres)', 3, '12'], ['Rosca alternada', 3, '10-12'], ['Tríceps francês', 3, '10-12'], ['Panturrilha em pé', 3, '15']]],
+  P1: ['Peito', [['Supino reto (barra)', 4, '6-10'], ['Supino inclinado (halteres)', 4, '8-12'], ['Supino reto na máquina', 3, '10-12'], ['Crucifixo', 3, '12-15'], ['Crossover', 3, '12-15']]],
+  C1: ['Costas', [['Puxada frontal', 4, '8-12'], ['Remada curvada', 4, '8-10'], ['Remada baixa', 3, '10-12'], ['Remada unilateral (serrote)', 3, '10-12'], ['Pull-down', 3, '12-15'], ['Hiperextensão lombar', 3, '12-15']]],
+  O1: ['Ombros e trapézio', [['Desenvolvimento (halteres)', 4, '8-10'], ['Elevação lateral', 4, '12-15'], ['Crucifixo inverso', 4, '12-15'], ['Face pull', 3, '15'], ['Encolhimento (halteres)', 4, '12']]],
+  B1: ['Braços, antebraço e core', [['Rosca inclinada', 3, '10-12'], ['Tríceps francês', 3, '10-12'], ['Rosca martelo', 3, '10-12'], ['Tríceps corda (polia)', 3, '12-15'], ['Rosca punho', 3, '15'], ['Panturrilha em pé', 3, '15'], ['Abdominal no cabo', 3, '12-15'], ['Prancha', 3, '45 s']]],
+  PCV: ['Superior — Peito, costas e ombros (volume)', [['Supino inclinado (barra)', 3, '10-12'], ['Puxada frontal', 3, '10-12'], ['Desenvolvimento na máquina', 3, '10-12'], ['Remada baixa', 3, '10-12'], ['Elevação lateral', 3, '15'], ['Voador (peck deck)', 3, '12-15'], ['Panturrilha em pé', 3, '15']]],
+};
+const PLANS = {
+  4: [[1, 'PA'], [2, 'LEG'], [4, 'PB'], [5, 'PC']],
+  5: [[1, 'PT'], [2, 'CB'], [3, 'LEG'], [4, 'OB'], [5, 'PCV']],
+  6: [[1, 'P1'], [2, 'C1'], [3, 'LEG'], [4, 'O1'], [5, 'B1'], [6, 'PCV']],
+};
+const WDN = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const PL = {days: 5, lvl: 'ini'};
+function buildPlan() {
+  const cardioDays = {4: [3, 6], 5: [6, 0], 6: [0]}[PL.days];
+  return PLANS[PL.days].map(([dow, k]) => {
+    const [name, items] = DAYS[k];
+    const its = items.map(([ex, s, r], i) => [ex, PL.lvl === 'ini' && (k !== 'LEG' || i < 2) ? Math.max(2, s - 1) : s, r]);
+    return {dow, key: k, name, items: its, cardio: k === 'LEG' ? 'Caminhada leve de 20 min para soltar as pernas (opcional)' : 'Caminhada inclinada de 20 a 30 min ao final (opcional)'};
+  });
+}
+function planVolume(plan) {
+  const v = {}; plan.forEach(d => d.items.forEach(([ex, s]) => { const x = exByName(ex); if (!x) return; v[x.g] = (v[x.g] || 0) + s; x.s.forEach(g => { v[g] = (v[g] || 0) + s * .5; }); }));
+  Object.keys(v).forEach(g => { v[g] = Math.round(v[g]); });
+  return v;
+}
+function planView() {
+  const plan = buildPlan(), vol = planVolume(plan), mins = d => Math.round(d.items.reduce((s, [, n]) => s + n * 3.2, 8));
+  const goalTxt = {Peito: [10, 20], Costas: [10, 20], Ombros: [10, 20], 'Bíceps': [6, 14], 'Tríceps': [6, 14], 'Quadríceps': [10, 20], Posterior: [8, 16], 'Glúteos': [6, 14], Panturrilha: [6, 14]};
+  const rows = Object.keys(goalTxt).map(g => { const n = vol[g] || 0, [lo, hi] = goalTxt[g], c = n >= lo ? 'var(--acc)' : n >= lo * .7 ? 'var(--warn)' : 'var(--bad)'; return `<div class="kv"><span>${g}</span><b style="color:${c}">${n} séries <small class="mut">(meta ${lo}–${hi})</small></b></div>`; }).join('');
+  return `<div class="card" style="margin-bottom:14px"><h3>🗓️ Plano semanal sugerido</h3><div class="mut" style="margin-bottom:10px">Um único dia de pernas e treino de parte superior nos outros dias, pensado para emagrecer mantendo e ganhando massa.</div>
+    <div class="row"><b>Dias por semana:</b>${[4, 5, 6].map(n => `<span class="chip ${PL.days === n ? 'on' : ''}" data-act="planDays" data-n="${n}">${n} dias</span>`).join('')}<b style="margin-left:10px">Nível:</b>${[['ini', 'Iniciante'], ['int', 'Intermediário']].map(([k, l]) => `<span class="chip ${PL.lvl === k ? 'on' : ''}" data-act="planLvl" data-k="${k}">${l}</span>`).join('')}</div></div>
+   <div class="grid">${plan.map(d => `<div class="card c6"><div class="row between"><h3>${WDN[d.dow]} — ${esc(d.name)}</h3><span class="pill">~${mins(d)} min</span></div>${d.items.map(([ex, s, r]) => { const x = exByName(ex); return `<div class="plit" data-act="exOpen" data-n="${esc(ex)}">${exThumbByName(ex)}<div class="grow"><b>${esc(ex)}</b><br><small class="mut">${s} × ${esc(r)}</small></div>${x ? rateBadge(x) : ''}</div>`; }).join('')}<small class="mut">🚶 ${esc(d.cardio)}</small></div>`).join('')}
+    <div class="card c6"><h3>📊 Séries por semana em cada músculo</h3>${rows}<small class="mut">Conta 1 série inteira para o músculo principal e meia série para os secundários. Pesquisas mostram ganhos maiores com 10 ou mais séries por semana por músculo. Como as pernas treinam 1 vez, concentre o esforço nesse dia e mantenha a qualidade.</small></div></div>
+   <div class="row" style="margin-top:14px"><button class="btn pri" data-act="planApply">✅ Usar este plano (cria os treinos e a agenda)</button></div>`;
+}
+function planApply() {
+  const plan = buildPlan();
+  if (S.routines.some(r => r.plan) && !confirm('Substituir os treinos do plano anterior pelos deste plano? Seus treinos criados manualmente não serão alterados.')) return;
+  const old = new Set(S.routines.filter(r => r.plan).map(r => r.id));
+  S.routines = S.routines.filter(r => !r.plan);
+  for (const k in S.schedule) if (old.has(S.schedule[k].routine)) S.schedule[k].routine = null;
+  plan.forEach(d => {
+    const id = uid();
+    S.routines.push({id, plan: true, name: `${WDN[d.dow].slice(0, 3)} — ${d.name}`, items: d.items.map(([ex, s, r]) => ({ex, sets: s, reps: r, load: ''}))});
+    S.schedule[d.dow] = Object.assign(S.schedule[d.dow] || {}, {routine: id, cardio: d.cardio});
+  });
+  save(); SUB.treino = 'agenda'; render(); toast('Plano criado! Veja a agenda e inicie o treino do dia.');
+}
+/* --- recomendações --- */
+function recsView() {
+  const w = curWeight() || 100, ref = refKg(), T = (() => { try { return targets(); } catch (e) { return {}; } })();
+  const row = (a, b, c, d) => `<tr><td>${a}</td><td>${b}</td><td>${c}</td><td>${d}</td></tr>`;
+  const key = ['Supino reto (barra)', 'Supino reto (halteres)', 'Remada curvada', 'Puxada frontal', 'Desenvolvimento (halteres)', 'Rosca direta', 'Tríceps corda (polia)', 'Agachamento livre', 'Leg press 45°', 'Stiff', 'Elevação pélvica', 'Cadeira extensora', 'Mesa flexora', 'Panturrilha em pé'];
+  return `<div class="grid">
+   <div class="card c12"><h3>✅ Resumo para o seu objetivo</h3><div>Você quer <b>emagrecer e ganhar massa</b> ao mesmo tempo. Isso funciona melhor com <b>déficit moderado</b>, <b>proteína alta</b> (${T.p ? 'sua meta é ' + fmt(T.p) + ' g/dia' : 'cerca de 2 g por kg'}), <b>treino de força pesado com progressão</b> e <b>cardio leve</b>. Treinar 4 a 6 dias, com 1 dia de pernas e o restante de superiores, é um bom formato.</div></div>
+   <div class="card c6"><h3>🔁 Séries, repetições e descanso</h3><table><tr><th>Tipo</th><th>Séries</th><th>Reps</th><th>Descanso</th></tr>
+    ${row('Compostos livres (agachamento, supino, remada)', '3–4', '6–10', '2–3 min')}${row('Máquinas e compostos guiados', '3', '8–12', '90 s–2 min')}${row('Isoladores (rosca, elevação lateral)', '3', '10–15', '60–90 s')}${row('Core', '3', '12–20 ou 30–60 s', '45–60 s')}</table>
+    <small class="mut">Termine as séries com 1 a 3 repetições sobrando (perto da falha, não além). Pesquisas não acham ganho extra com descansos acima de 90 s, mas descansar mais de 60 s ajuda a manter a carga.</small></div>
+   <div class="card c6"><h3>📅 Volume semanal</h3>
+    <div class="kv"><span>Cada músculo grande</span><b>10 a 20 séries/semana</b></div><div class="kv"><span>Bíceps, tríceps, glúteos, panturrilha</span><b>6 a 14 séries/semana</b></div><div class="kv"><span>Iniciante (primeiros 2 meses)</span><b>8 a 12 séries/semana</b></div><div class="kv"><span>Frequência por músculo</span><b>2×/semana</b></div>
+    <small class="mut">Mais séries trazem mais crescimento até certo ponto (a partir de 10 séries/semana os ganhos aparecem). Durante o emagrecimento, mantenha o volume sem exagerar. Pernas 1×/semana funcionam com bom volume nesse dia.</small></div>
+   <div class="card c12"><h3>🏋️ Cargas iniciais estimadas (para ${fmt(ref, 0)} kg de referência)</h3><div class="mut" style="margin-bottom:8px">Pontos de partida para iniciantes, baseados no seu peso ajustado (${fmt(w, 1)} kg atuais). Teste com uma carga leve e ajuste.</div>
+    <table><tr><th>Exercício</th><th>Carga inicial</th><th>Reps</th></tr>${key.map(n => { const x = exByName(n); return x ? `<tr><td>${esc(n)}</td><td>${exLoadText(x)}</td><td>${exRec(x).reps}</td></tr>` : ''; }).join('')}</table>
+    <small class="mut">Na dúvida, comece mais leve: aprender a técnica é mais importante que a carga nas primeiras semanas.</small></div>
+   <div class="card c6"><h3>📈 Como progredir</h3><ol style="margin:0;padding-left:18px;line-height:1.7"><li>Escolha uma faixa de repetições (ex.: 8 a 12).</li><li>Faça todas as séries na mesma carga.</li><li>Quando conseguir o topo da faixa em todas as séries, suba a carga em cerca de 5% (2,5 kg em barras, 1 a 2 kg em halteres) e volte ao início da faixa.</li><li>Se não evoluir por 3 semanas, revise sono, comida e técnica.</li><li>A cada 6 a 8 semanas, faça uma semana mais leve (reduza séries ou carga em 30–40%).</li></ol>
+    <small class="mut">O app já sugere a próxima carga na tela de cada exercício, com base no que você registrou.</small></div>
+   <div class="card c6"><h3>🚶 Cardio para emagrecer sem perder músculo</h3><ul style="margin:0;padding-left:18px;line-height:1.7"><li><b>Caminhada inclinada</b> de 20 a 40 min, 3 a 4×/semana, em ritmo de conversa.</li><li>Meta de <b>8.000 a 10.000 passos</b> por dia.</li><li>Prefira <b>bicicleta, remo e esteira inclinada</b> a corrida e pulos enquanto o peso for alto (menos impacto nos joelhos).</li><li>Se fizer intervalado, no máximo 1×/semana e longe do dia de pernas.</li></ul></div>
+   <div class="card c6"><h3>🍗 Alimentação para o treino</h3><ul style="margin:0;padding-left:18px;line-height:1.7"><li>Proteína ${T.p ? 'de ' + fmt(T.p) + ' g/dia' : 'em torno de 2 g por kg'}, distribuída em 4 refeições.</li><li>Perda de peso de <b>0,5 a 1% do peso por semana</b> (${fmt(w * .005, 1)} a ${fmt(w * .01, 1)} kg) ajuda a preservar a massa magra.</li><li>Déficit grande demais atrapalha o ganho de músculo: mantenha-se perto da meta de calorias do app.</li><li>Faça uma refeição com carboidrato e proteína 1 a 2 h antes do treino.</li><li>Durma de 7 a 9 horas: sono ruim reduz a recuperação e aumenta a fome.</li></ul></div>
+   <div class="card c6"><h3>🛡️ Segurança</h3><ul style="margin:0;padding-left:18px;line-height:1.7"><li>Aqueça 5 a 8 minutos e faça 1 a 2 séries leves do primeiro exercício.</li><li>Dor aguda, formigamento ou dor em articulação: pare e troque o exercício.</li><li>Em supino e agachamento pesados, use pinos de segurança ou um parceiro.</li><li>Se tiver problema de coluna, joelho, ombro ou pressão, consulte um médico ou educador físico.</li></ul></div>
+   <div class="card c12"><small class="mut">Base: meta-análises de volume e hipertrofia (Schoenfeld e colaboradores, 2016 e 2017), revisão sobre intervalos de descanso (2024), revisões sobre preservação de massa magra em déficit calórico e a posição da Sociedade Internacional de Nutrição Esportiva. Estimativas gerais, não substituem avaliação profissional.</small></div></div>`;
+}
+/* --- ações --- */
+Object.assign(ACT, {
+  libG: a => { LIB.g = a.dataset.g; render(); }, libR: a => { LIB.r = a.dataset.r; render(); },
+  xpG: a => { XP.g = a.dataset.g; openExPicker(); }, xpR: a => { XP.r = a.dataset.r; openExPicker(); },
+  exOpen: a => exDetail(a.dataset.n), exAddTo: a => exAddTo(a.dataset.n),
+  exAddRoutine: a => { const r = S.routines.find(x => x.id === a.dataset.id); r.items.push(newItem(a.dataset.n)); save(); closeModal(); render(); toast('Adicionado a ' + r.name); },
+  exAddNew: a => { RE = {name: '', items: [newItem(a.dataset.n)]}; renderRoutineEditor(); },
+  reLib: () => { RE.name = ($('#re-name') || {}).value || RE.name; openExPicker(); },
+  xpBack: () => renderRoutineEditor(),
+  exPick: a => { RE.items.push(newItem(a.dataset.n)); renderRoutineEditor(); toast(a.dataset.n + ' adicionado'); },
+  planDays: a => { PL.days = +a.dataset.n; render(); }, planLvl: a => { PL.lvl = a.dataset.k; render(); }, planApply: () => planApply(),
+});
+document.addEventListener('input', e => {
+  const t = e.target; if (t.id === 'lib-q') { LIB.q = t.value; $('#lib-grid').innerHTML = exGrid(LIB); }
+  if (t.id === 'xp-q') { XP.q = t.value; $('#xp-grid').innerHTML = exGrid(XP, 'exPick'); }
+});
+document.addEventListener('change', e => {
+  const t = e.target; if (t.id === 'lib-e') { LIB.e = t.value; $('#lib-grid').innerHTML = exGrid(LIB); }
+  if (t.id === 'xp-e') { XP.e = t.value; $('#xp-grid').innerHTML = exGrid(XP, 'exPick'); }
+});
+
+
 /* ================= SINCRONIZAÇÃO ENTRE APARELHOS (Gist privado do GitHub, grátis) ================= */
 const SKEY = 'dieta.sync';
 const SY = Object.assign({token: '', gist: '', base: 0, last: 0, err: '', login: ''}, (() => { try { return JSON.parse(localStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; } })());
@@ -2255,7 +2957,7 @@ function syStart() {
 
 
 /* ================= CONTEÚDO ATUALIZÁVEL (histórias, promoções) E NOVAS VERSÕES ================= */
-const BUILD = 'd8a1b04b2c';
+const BUILD = '16bf4c5f3e';
 const CKEY = 'dieta.content';
 function applyContent(c) {
   if (!c) return;
