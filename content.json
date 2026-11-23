@@ -1,0 +1,428 @@
+{
+ "updated": "2026-11-22",
+ "promosDate": "22/11/2026",
+ "stories": [
+  {
+   "t": "Emagreci 101 kg porque queria viver",
+   "who": "Larisse Rosa Pinheiro",
+   "src": "IstoÉ",
+   "url": "https://istoe.com.br/historia-de-inspiracao/",
+   "txt": "A dentista conta que o ganho de peso começou na adolescência e como ela virou o jogo ao longo dos anos.",
+   "tag": "Superação"
+  },
+  {
+   "t": "Perdeu 100 kg em um ano e virou meio-maratonista",
+   "who": "Fabiano Lacerda",
+   "src": "IstoÉ",
+   "url": "https://istoe.com.br/nao-conseguia-nem-passar-pela-catraca-diz-empresario-que-perdeu-100-quilos-em-um-ano",
+   "txt": "Publicitário que mal passava pela catraca hoje combina corrida, natação e musculação e já completou oito meias-maratonas. Ele atribui o ganho de peso à falta de regras na rotina.",
+   "tag": "Corrida"
+  },
+  {
+   "t": "A corrida me ensinou o que é viver de verdade",
+   "who": "Mário Alberto Constanski",
+   "src": "IstoÉ",
+   "url": "https://istoe.com.br/uma-2a-chance-a-corrida-me-ensinou-o-que-e-viver-de-verdade",
+   "txt": "Relato em primeira pessoa sobre uma segunda chance e o papel da corrida na mudança de vida do autor.",
+   "tag": "Corrida"
+  },
+  {
+   "t": "33 kg a menos apenas mudando os hábitos",
+   "who": "Rosangela Theodoro",
+   "src": "Ministério da Saúde (Saúde Brasil)",
+   "url": "https://www.gov.br/saude/pt-br/assuntos/saude-brasil/eu-quero-ter-peso-saudavel/noticias/2017/depoimento-em-video-veja-como-rosangela-conseguiu-perder-33kg-mudando-seus-habitos",
+   "txt": "Depoimento em vídeo de uma dona de casa que perdeu 33 kg com mudanças simples de rotina.",
+   "tag": "Hábitos"
+  },
+  {
+   "t": "Um pouco por dia",
+   "who": "Manu",
+   "src": "Vitat",
+   "url": "https://vitat.com.br/combate-a-obesidade-na-vida-real/",
+   "txt": "A empreendedora chegou a 110 kg e viu que o emagrecimento não é rápido nem milagroso: veio com nutricionista, treino e muita paciência.",
+   "tag": "Constância"
+  },
+  {
+   "t": "88 kg a menos em 21 meses, com ajuda dos amigos",
+   "who": "Kayron Albuquerque",
+   "src": "Diário do Nordeste",
+   "url": "https://diariodonordeste.verdesmares.com.br/opiniao/colunistas/beatriz-juca/kayron-albuquerque-sou-vitorioso-por-ter-perdido-88-quilos-com-a-ajuda-dos-amigos-sem-cirurgia-1.3341445",
+   "txt": "Aos 33 anos, mudou hábitos, abraçou caminhadas e corridas e contou com uma força-tarefa de amigos e uma nutricionista.",
+   "tag": "Caminhada"
+  },
+  {
+   "t": "Do sedentarismo a 50 kg a menos só com treino",
+   "who": "Alex \"Big\" Nunes Santos",
+   "src": "A Tarde",
+   "url": "https://atarde.com.br/esportes/conheca-big-o-baiano-que-superou-a-obesidade-com-a-corrida-1243742",
+   "txt": "O motorista de aplicativo passava dos 130 kg em 2020 e perdeu cerca de 50 kg em três anos com corrida, sem remédio e sem cirurgia.",
+   "tag": "Corrida"
+  },
+  {
+   "t": "De 140 kg à vida de fisiculturista",
+   "who": "Samuel",
+   "src": "Campo Grande News",
+   "url": "https://www.campograndenews.com.br/lado-b/comportamento-23-08-2011-08/samuel-saiu-da-obesidade-de-140-kg-para-o-shape-de-fisiculturista",
+   "txt": "Ele chegou aos 140 kg, nunca aceitou que a obesidade fosse destino e depois da perda de peso mergulhou na musculação.",
+   "tag": "Musculação"
+  },
+  {
+   "t": "25 kg a menos e 10 km de corrida",
+   "who": "Ubiratan Nogueira",
+   "src": "Folha Vitória",
+   "url": "https://www.folhavitoria.com.br/esportes/paixao-por-corrida-ubiratan-nogueira-perdeu-25-kg-e-chegou-aos-40-anos-esbanjando-saude/",
+   "txt": "Com histórico familiar de diabetes e hipertensão, ele decidiu mudar antes dos 40 e fez sua primeira prova de 10 km.",
+   "tag": "Corrida"
+  },
+  {
+   "t": "109 kg depois de um recomeço",
+   "who": "Luiz",
+   "src": "Campo Grande News",
+   "url": "https://www.campograndenews.com.br/lado-b/faz-bem/luiz-emagreceu-109-kg-depois-da-esposa-pedir-separacao-no-natal",
+   "txt": "Com o apoio de um amigo de infância personal trainer e uma dieta que ensinou que dava para comer e emagrecer, Luiz reconstruiu a rotina.",
+   "tag": "Recomeço"
+  },
+  {
+   "t": "Perdeu 110 kg e virou fisiculturista",
+   "who": "Leonardo Machado Ayres Cunha",
+   "src": "Folha de Pernambuco",
+   "url": "https://www.folhape.com.br/noticias/homem-perde-110kg-vira-fisiculturista-e-conquista-ate-torneio-eu/383251/",
+   "txt": "A história dele cruzou fronteiras e virou símbolo para quem enfrenta a obesidade desde a infância.",
+   "tag": "Musculação"
+  },
+  {
+   "t": "52 kg a menos em pouco mais de dois anos",
+   "who": "Nayara Pires Monteiro",
+   "src": "Mais Goiás",
+   "url": "https://www.maisgoias.com.br/cidades/goiana-elimina-52-quilos-sem-cirurgia-bariatrica-ou-medicamentos-e-desabafa-eu-era-invisivel/",
+   "txt": "Acompanhamento nutricional, treino e o apoio da família (a irmã preparava as marmitas) sustentaram a mudança.",
+   "tag": "Reeducação"
+  },
+  {
+   "t": "Registrar tudo e cortar o açúcar",
+   "who": "Dietmar, 47",
+   "src": "Yazio",
+   "url": "https://www.yazio.com/pt/historias-de-sucesso/8-historia-de-sucesso-de-dietmar.html",
+   "txt": "Depois de várias dietas que não deram certo, ele passou a registrar alimentos e atividades todos os dias e começou com pequenas caminhadas.",
+   "tag": "Registro diário"
+  },
+  {
+   "t": "De 96 kg para 61 kg aos 25 anos",
+   "who": "Naiomi",
+   "src": "Yazio",
+   "url": "https://www.yazio.com/pt/historias-de-sucesso/15-historia-de-sucesso-de-naiomi.html",
+   "txt": "Ela percebeu que precisava mudar para ter mais qualidade de vida e passou a se interessar de verdade por exercício e reeducação alimentar.",
+   "tag": "Jovem"
+  },
+  {
+   "t": "60 kg a menos depois de um alerta de saúde",
+   "who": "Cíntia Bruno",
+   "src": "Bem Paraná",
+   "url": "https://www.bemparana.com.br/publicacao/colunas/comporte-se/como-perdi-mais-de-60-quilos-na-pandemia/amp/",
+   "txt": "Um diagnóstico de resistência à insulina deu o ponto de partida da jornada, que incluiu altos e baixos e um ano sem se pesar.",
+   "tag": "Saúde"
+  },
+  {
+   "t": "45 kg em dois anos e um ano trocando gordura por músculo",
+   "who": "Octávio Torres, 23 anos",
+   "src": "UAI (Estado de Minas)",
+   "url": "https://www.uai.com.br/app/noticia/saude/2014/08/04/noticias-saude,191912/amp.html",
+   "txt": "O estudante defende o ritmo lento e gradual. A matéria traz também outros relatos de quem manteve o peso depois.",
+   "tag": "Jovem"
+  },
+  {
+   "t": "45 kg com corridas diárias e musculação",
+   "who": "Ferrugem",
+   "src": "Folha de Pernambuco",
+   "url": "https://www.folhape.com.br/cultura/como-ferrugem-perdeu-45-kg-com-corridas-diarias-e-medo-de-morrer-na/488840/",
+   "txt": "Alimentação equilibrada, musculação e corridas todos os dias mudaram o corpo e a rotina do cantor.",
+   "tag": "Rotina"
+  },
+  {
+   "t": "Quase 60 kg a menos com academia diária",
+   "who": "Yarley",
+   "src": "Correio 24 Horas",
+   "url": "https://www.correio24horas.com.br/em-alta/ele-pesava-153-kg-e-sofria-com-problemas-de-saude-mudou-de-habitos-eliminou-quase-60-kg-e-agora-recebe-elogios-de-famosas-1026",
+   "txt": "Um alerta médico fez o influenciador começar reeducação alimentar e frequentar a academia todos os dias, mesmo sem intimidade com exercício.",
+   "tag": "Academia"
+  },
+  {
+   "t": "50 kg a menos com CrossFit",
+   "who": "João Gabriel, 27 anos",
+   "src": "Wellhub",
+   "url": "https://wellhub.com/pt-br/blog/comunidade/jovem-emagrece-50kg-crossfit/",
+   "txt": "Depois de várias tentativas na musculação, ele descobriu no CrossFit uma atividade de que gosta e passou a treinar com frequência.",
+   "tag": "Jovem"
+  },
+  {
+   "t": "65 kg em um ano e meio sem caneta nem cirurgia",
+   "who": "Lara Jade, 22 anos",
+   "src": "TNH1 / Terra",
+   "url": "https://www.tnh1.com.br/noticia/nid/jovem-perde-65kg-em-um-ano-e-meio-sem-uso-de-canetas-ou-de-bariatrica/",
+   "txt": "Ela conta que a dieta muito restritiva do passado não se sustentou e que o ritmo lento foi o que funcionou.",
+   "tag": "Constância"
+  },
+  {
+   "t": "De 210 kg para cerca de 86 kg",
+   "who": "David John Castañeda",
+   "src": "Diário do Pará",
+   "url": "https://diariodopara.com.br/cotidiano/jovem-perde-124-kg-sem-cirurgia-ou-caneta-emagrecedora-e-vira-coach-de-emagrecimento/",
+   "txt": "Mudanças na alimentação, treino e continuidade ao longo de quase três anos, segundo o relato dele.",
+   "tag": "Constância"
+  },
+  {
+   "t": "58 kg a menos em dois anos",
+   "who": "Adriana",
+   "src": "Campo Grande News",
+   "url": "https://www.campograndenews.com.br/lado-b/faz-bem/para-superar-a-si-mesma-com-disciplina-veterinaria-emagreceu-60kg-em-2-anos",
+   "txt": "A veterinária chegou aos 115 kg após três filhos e retomou o controle com reeducação alimentar, exercício e disciplina.",
+   "tag": "Reeducação"
+  },
+  {
+   "t": "50 kg a menos com musculação e futebol",
+   "who": "MC Binn",
+   "src": "Correio 24 Horas",
+   "url": "https://www.correio24horas.com.br/em-alta/mc-binn-desabafa-apos-perder-50-kg-nao-estou-satisfeito-1225",
+   "txt": "Treino pesado, futebol quase diário e alimentação controlada durante dois anos.",
+   "tag": "Rotina"
+  },
+  {
+   "t": "Como perdi mais de 30 kg sozinha (vídeo)",
+   "who": "Vanessa",
+   "src": "YouTube (resumo no VideoHighlight)",
+   "url": "https://videohighlight.com/v/wQiOHSrcL8c",
+   "txt": "Em vídeo, ela conta como foi de até 98 kg para 66 kg, sem dieta estruturada e sem frequentar a academia com regularidade.",
+   "tag": "Vídeo"
+  }
+ ],
+ "promos": [
+  {
+   "cat": "whey",
+   "store": "Max Titanium",
+   "name": "Whey Pro 1 kg (concentrado)",
+   "price": 109.9,
+   "old": null,
+   "g": 1000,
+   "prot": null,
+   "url": "https://www.maxtitanium.com.br/produtos/proteinas/concentrada",
+   "note": "Campanha MAX NOVEMBER (19% OFF). À vista no Pix: R$ 106,60."
+  },
+  {
+   "cat": "whey",
+   "store": "Max Titanium",
+   "name": "100% Whey pote 900 g",
+   "price": 210.39,
+   "old": null,
+   "g": 900,
+   "prot": null,
+   "url": "https://www.maxtitanium.com.br/produtos/proteinas/concentrada",
+   "note": "12% OFF. À vista no Pix: R$ 204,08."
+  },
+  {
+   "cat": "whey",
+   "store": "Max Titanium",
+   "name": "Kit 2x Whey Pro 1 kg (2 kg)",
+   "price": null,
+   "old": null,
+   "g": 2000,
+   "prot": null,
+   "url": "https://www.maxtitanium.com.br/pack-2x-whey-pro-1kg/p",
+   "note": "24% OFF na campanha MAX NOVEMBER. Veja o valor final no site."
+  },
+  {
+   "cat": "whey",
+   "store": "Growth Supplements",
+   "name": "Campanha Black Growth",
+   "price": null,
+   "old": null,
+   "g": null,
+   "prot": null,
+   "url": "https://www.cupomonline.com.br/cupom-growth-suplementos/",
+   "note": "Segundo agregador de cupons: 10% de desconto no Pix/boleto e 20% de cashback em GPontos até 30/11."
+  },
+  {
+   "cat": "whey",
+   "store": "Growth (via Magalu)",
+   "name": "Whey concentrado 1 kg",
+   "price": 190,
+   "old": null,
+   "g": 1000,
+   "prot": 80,
+   "url": "https://www.magazineluiza.com.br/marcas/growth",
+   "note": "Preço no Pix (2x R$ 100 sem juros). Cupom de R$ 10 em alguns anúncios."
+  },
+  {
+   "cat": "whey",
+   "store": "Black Skull (via Magalu)",
+   "name": "Whey Turbo concentrado 907 g (refil)",
+   "price": 75.47,
+   "old": null,
+   "g": 907,
+   "prot": null,
+   "url": "https://www.magazineluiza.com.br/busca/whey/",
+   "note": "Preço no Pix. Varia por vendedor."
+  },
+  {
+   "cat": "whey",
+   "store": "Integralmédica (via Magalu)",
+   "name": "Nutri Whey 907 g",
+   "price": 74.1,
+   "old": null,
+   "g": 907,
+   "prot": null,
+   "url": "https://www.magazineluiza.com.br/busca/whey/",
+   "note": "Preço no Pix com cupom de R$ 10 em alguns anúncios."
+  },
+  {
+   "cat": "creatina",
+   "store": "Masterway",
+   "name": "Creatina monohidratada 1 kg",
+   "price": 105,
+   "old": 249.9,
+   "g": 1000,
+   "prot": 0,
+   "url": "https://www.masterwaysuplementos.com.br/black-friday",
+   "note": "58% OFF. Também: 300 g por R$ 45,00 e 500 g por R$ 59,90."
+  },
+  {
+   "cat": "creatina",
+   "store": "Masterway",
+   "name": "Creatina monohidratada 300 g",
+   "price": 45,
+   "old": 102.9,
+   "g": 300,
+   "prot": 0,
+   "url": "https://www.masterwaysuplementos.com.br/black-friday",
+   "note": "56% OFF. Em até 6x de R$ 7,50."
+  },
+  {
+   "cat": "creatina",
+   "store": "Espartanos",
+   "name": "Creatina 100% pura 1 kg",
+   "price": 107.91,
+   "old": 189.9,
+   "g": 1000,
+   "prot": 0,
+   "url": "https://www.espartanos.com.br/suplementos-na-black-friday-whey-protein-bcaa-creatina",
+   "note": "Preço no Pix. Anúncio cita laudo ABENUTRI."
+  },
+  {
+   "cat": "creatina",
+   "store": "Dux Human Health",
+   "name": "Creatina monohidratada 300 g",
+   "price": 59.9,
+   "old": 89.9,
+   "g": 300,
+   "prot": 0,
+   "url": "https://duxhumanhealth.com/black-friday/",
+   "note": "33% OFF na Black Friday da marca."
+  },
+  {
+   "cat": "creatina",
+   "store": "Amazon (Soldiers Nutrition)",
+   "name": "Creatina monohidratada 500 g",
+   "price": 44.9,
+   "old": 78.9,
+   "g": 500,
+   "prot": 0,
+   "url": "https://www.amazon.com.br/creatina-promo%C3%A7%C3%A3o/s?k=creatina+promo%C3%A7%C3%A3o",
+   "note": "Oferta Black Friday. Preços e vendedores mudam; confira."
+  },
+  {
+   "cat": "creatina",
+   "store": "Amazon (Integralmédica)",
+   "name": "Creatina Hardcore 150 g",
+   "price": 24.31,
+   "old": 54.9,
+   "g": 150,
+   "prot": 0,
+   "url": "https://www.amazon.com.br/creatina-promo%C3%A7%C3%A3o/s?k=creatina+promo%C3%A7%C3%A3o",
+   "note": "Oferta Black Friday. Potes pequenos têm custo por grama maior."
+  },
+  {
+   "cat": "creatina",
+   "store": "Max Titanium",
+   "name": "Creatinas com desconto de até 50%",
+   "price": null,
+   "old": null,
+   "g": null,
+   "prot": null,
+   "url": "https://descontostop.com/loja/cupom-desconto-max-titanium/",
+   "note": "Segundo agregador de cupons. Confira no site oficial da marca."
+  }
+ ],
+ "quotes": [
+  "Você não precisa ser perfeito hoje. Precisa ser consistente na maioria dos dias.",
+  "Cada refeição registrada é um voto no tipo de pessoa que você está se tornando.",
+  "A balança mede peso, não esforço. Confie no processo e olhe a tendência.",
+  "Disciplina é fazer o combinado mesmo quando a motivação foi dormir.",
+  "O treino de hoje não muda o espelho amanhã, mas muda quem entra na academia na semana que vem.",
+  "Progresso lento ainda é progresso. Pior é ficar parado.",
+  "Não é sobre comer menos para sempre. É sobre aprender a comer bem por toda a vida.",
+  "Um deslize não estraga a semana. Abandonar o plano, sim.",
+  "Seu corpo ouve tudo o que você faz. Faça por ele.",
+  "Metas pequenas, repetidas todo dia, constroem resultados grandes.",
+  "Hoje é um bom dia para ser a versão de você que você quer ver daqui a um ano.",
+  "Ninguém acorda com vontade de sistema; mas é o sistema que traz o resultado. Você está construindo o seu.",
+  "Água, proteína, sono e passos: o básico bem feito vence o plano mirabolante.",
+  "Todo especialista já foi iniciante que não desistiu.",
+  "Você já está mais perto do que ontem.",
+  "Registre sem culpa: o dado honesto é o que te ajuda a ajustar.",
+  "A dor do treino passa. A satisfação de ter treinado fica.",
+  "O melhor plano é aquele que você consegue seguir numa terça-feira chuvosa.",
+  "Comida não é inimiga. O que precisa de plano é o descontrole.",
+  "Respeite o descanso: o músculo se recupera e o corpo se adapta no intervalo entre os treinos.",
+  "Caminhe mesmo que seja pouco. Pouco todo dia vira muito no mês.",
+  "Compare-se apenas com o seu eu de ontem.",
+  "A motivação te faz começar. O hábito te faz continuar.",
+  "Seu futuro agradece cada escolha que você faz agora.",
+  "Se fosse fácil, todo mundo já teria conseguido. Você está fazendo o difícil.",
+  "Tropeçou? Levanta, ajusta e segue. O plano continua valendo.",
+  "Pese, registre, ajuste, repita.",
+  "Resultado é a soma de dias comuns bem vividos.",
+  "Não espere se sentir pronto: comece e a confiança vem no caminho.",
+  "Cada quilo a menos é menos peso nos joelhos, no coração e na cabeça.",
+  "Treinar é um presente que você dá ao seu corpo, não um castigo.",
+  "Pequenas vitórias merecem comemoração: mais uma semana no plano.",
+  "Sua jornada não precisa ser parecida com a de ninguém. Só precisa ser sua.",
+  "A semana tem 21 refeições principais. Acertar 18 já te leva longe.",
+  "Foque no processo: o número na balança vem junto.",
+  "Hoje eu escolho o que vai me deixar orgulhoso amanhã.",
+  "Você não está começando do zero: está começando com tudo o que já aprendeu.",
+  "Corpo forte se constrói no prato, na barra e na cama.",
+  "Não existe atalho, mas existe caminho. E você já está nele.",
+  "Cuide do seu corpo: é o único lugar onde você vai morar a vida inteira.",
+  "Treine como quem se respeita; coma como quem se cuida.",
+  "Antes de desistir, descanse. Depois, continue.",
+  "O platô é só o corpo pedindo paciência e um pequeno ajuste.",
+  "Mantenha a promessa que você fez para si mesmo.",
+  "Dia ruim também conta, se você registrar e seguir em frente.",
+  "A constância transforma esforço comum em resultado extraordinário.",
+  "Beba água, mexa o corpo, durma bem e repita amanhã.",
+  "Saúde é construída em dias comuns.",
+  "Você consegue mais do que imagina. A prova está em tudo o que já superou.",
+  "Comece pelo que está ao seu alcance hoje."
+ ],
+ "tips": [
+  "Pese os alimentos sempre no mesmo estado (cru ou cozido). O app usa os valores indicados no nome de cada alimento.",
+  "Proteína em todas as refeições ajuda na saciedade e na preservação de massa magra durante o déficit.",
+  "Encha metade do prato com verduras e legumes: mais volume e fibras por poucas calorias.",
+  "Dormir menos de 7 h costuma aumentar a fome e a vontade de doces no dia seguinte.",
+  "Pese-se sempre em jejum, depois de ir ao banheiro. Olhe a média da semana, não o número do dia.",
+  "Líquidos calóricos (suco, refrigerante, álcool) somam calorias sem dar saciedade.",
+  "Treino de força 2–3x por semana ajuda a manter os músculos enquanto você perde gordura.",
+  "Caminhar 30–60 minutos por dia queima calorias sem exigir muita recuperação.",
+  "Planejar o dia seguinte reduz decisões de última hora (e escolhas por impulso).",
+  "Um copo de água antes das refeições pode ajudar a controlar o apetite.",
+  "Mantenha lanches proteicos prontos: ovos cozidos, iogurte, frutas.",
+  "Meça o azeite e os molhos com colher: são centenas de calorias que passam despercebidas.",
+  "Registre antes de comer: é mais fácil ajustar a porção do que se arrepender depois.",
+  "Retenção de líquidos pode esconder a perda de gordura por dias. Confie na tendência.",
+  "Aumente distância e carga aos poucos (cerca de 10% por semana) para proteger as articulações.",
+  "Busque cerca de 14 g de fibra a cada 1000 kcal: feijão, aveia, frutas e verduras ajudam.",
+  "Planeje uma refeição mais livre por semana dentro das calorias. Isso ajuda a manter o plano.",
+  "Evite cortar grupos alimentares inteiros: o melhor plano é o que você consegue manter.",
+  "Creatina (3–5 g/dia) pode somar 1–2 kg na balança por retenção de água nos músculos. Não é gordura.",
+  "Se o peso parar por 2–3 semanas, revise porções, fins de semana e passos antes de cortar mais calorias."
+ ]
+}
